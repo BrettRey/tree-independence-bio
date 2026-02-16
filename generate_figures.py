@@ -4,11 +4,14 @@ Produces:
   1. LaTeX table of all computational results  (stdout + figures/results_table.tex)
   2. Scatter plot of near-miss ratio vs n       (figures/nm_vs_n.pdf)
   3. Normalised polynomial shape overlay        (figures/poly_shapes.pdf)
+  4. P(v) vs degree scatter plot                (figures/pv_vs_degree.pdf)
+  5. Null-model nm comparison box plot          (figures/null_model_nm.pdf)
 
 Usage:
     python generate_figures.py
 """
 
+import json
 import sys
 from pathlib import Path
 
@@ -22,6 +25,7 @@ sys.path.insert(0, str(ERDOS))
 
 from bio_trees import read_swc, read_newick
 from indpoly import independence_poly, near_miss_ratio
+from occupation import occupation_probabilities
 
 import matplotlib
 matplotlib.use("Agg")  # non-interactive backend
@@ -250,6 +254,17 @@ def _load_tree(category, filename):
     return n, adj
 
 
+def _load_tree_with_meta(category, filename):
+    """Load a biological tree, returning metadata too."""
+    if category == "neuron":
+        path = PROJECT / "data" / "neuromorpho" / filename
+        n, adj, meta = read_swc(path)
+    else:
+        path = PROJECT / "data" / "phylogenies" / filename
+        n, adj, meta = read_newick(path)
+    return n, adj, meta
+
+
 def plot_poly_shapes():
     """Overlay normalised polynomial shapes for 4 representative trees."""
 
@@ -309,6 +324,182 @@ def plot_poly_shapes():
 
 
 # ---------------------------------------------------------------------------
+# 4. P(v) vs degree scatter plot
+# ---------------------------------------------------------------------------
+
+def plot_pv_vs_degree():
+    """Scatter plot of occupation probability P(v) vs vertex degree.
+
+    Shows 3 representative trees (one small phylogeny, one neuronal arbor,
+    one larger phylogeny) to illustrate Hub Exclusion quantitatively:
+    high-degree vertices cluster at low P(v).
+    """
+    representatives = [
+        ("phylo", "Homininae ($n=46$)", "homininae.nwk"),
+        ("neuron", "Monkey L3 pyramidal ($n=1{,}038$)", "cnic_041.CNG.swc"),
+        ("phylo", "Primates ($n=1{,}333$)", "primates.nwk"),
+    ]
+
+    markers = [
+        {"marker": "^", "s": 18, "facecolors": "none",
+         "edgecolors": "#d95f02", "linewidths": 0.7},
+        {"marker": "o", "s": 10, "facecolors": "#2166ac",
+         "edgecolors": "#2166ac", "linewidths": 0.4},
+        {"marker": "s", "s": 12, "facecolors": "none",
+         "edgecolors": "#7570b3", "linewidths": 0.7},
+    ]
+
+    fig, ax = plt.subplots(figsize=(5.5, 3.8))
+
+    for (cat, label, fname), mstyle in zip(representatives, markers):
+        print(f"  Computing P(v) for {label}...")
+        n, adj, meta = _load_tree_with_meta(cat, fname)
+        root = meta.get("root", 0)
+        probs = occupation_probabilities(n, adj, root=root)
+        degrees = [len(adj[i]) for i in range(n)]
+
+        # Jitter degree slightly for visibility
+        deg_jitter = np.array(degrees) + np.random.default_rng(42).uniform(
+            -0.15, 0.15, size=n)
+
+        ax.scatter(deg_jitter, probs, label=label, alpha=0.6, zorder=3,
+                   **mstyle)
+
+    # Reference line at P(v) = 1/3 (edge bound threshold)
+    ax.axhline(y=1 / 3, color="0.5", linestyle=":", linewidth=0.7, zorder=1)
+    ax.text(ax.get_xlim()[1] * 0.85, 1 / 3 + 0.01, "$1/3$",
+            fontsize=8, color="0.5", ha="right")
+
+    ax.set_xlabel("Vertex degree")
+    ax.set_ylabel("Occupation probability $P(v)$")
+    ax.set_xlim(0.5, None)
+    ax.set_ylim(-0.01, 0.55)
+
+    ax.legend(loc="upper right", frameon=True, framealpha=0.95,
+              edgecolor="0.8", fancybox=False, fontsize=8)
+
+    ax.yaxis.grid(True, linewidth=0.3, color="0.85", zorder=0)
+    ax.xaxis.grid(False)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.tick_params(top=False, right=False)
+
+    out_path = FIGURES / "pv_vs_degree.pdf"
+    fig.savefig(out_path)
+    plt.close(fig)
+    print(f"P(v) vs degree saved to {out_path}")
+
+
+# ---------------------------------------------------------------------------
+# 5. Null-model nm comparison
+# ---------------------------------------------------------------------------
+
+def plot_null_model_nm():
+    """Box plot comparing biological nm to null-model distributions.
+
+    Reads precomputed null-model results from JSON. Falls back to a
+    quick computation if no results file is found.
+    """
+    # Try to load precomputed results
+    results_path = PROJECT / "null_model_results.json"
+    if not results_path.exists():
+        results_path = PROJECT / "null_model_results_quick.json"
+    if not results_path.exists():
+        results_path = PROJECT / "null_model_results_small.json"
+
+    if not results_path.exists():
+        print("  No null-model results found. Run null_model.py first.")
+        return
+
+    with open(results_path) as f:
+        raw = json.load(f)
+
+    # Build biological nm lookup
+    bio_nm = {}
+    bio_cat = {}
+    for row in NEURONS:
+        bio_nm[row[2]] = row[5]
+        bio_cat[row[2]] = "neuron"
+    for row in PHYLOGENIES:
+        bio_nm[row[1]] = row[4]
+        bio_cat[row[1]] = "phylo"
+
+    # Collect Prüfer results (primary null model)
+    entries = []
+    for key, data in raw.items():
+        if data["model"] != "prufer":
+            continue
+        n = data["n"]
+        if n not in bio_nm:
+            continue
+        entries.append((n, data["nms"], bio_nm[n], bio_cat[n]))
+
+    entries.sort(key=lambda x: x[0])
+
+    if not entries:
+        print("  No matching null-model entries found.")
+        return
+
+    fig, ax = plt.subplots(figsize=(6.5, 4.0))
+
+    positions = list(range(len(entries)))
+    labels = []
+
+    for i, (n, null_nms, bio, cat) in enumerate(entries):
+        # Box plot for null distribution
+        bp = ax.boxplot([null_nms], positions=[i], widths=0.5,
+                        patch_artist=True, showfliers=False,
+                        boxprops=dict(facecolor="#d4e6f1", edgecolor="0.4",
+                                      linewidth=0.6),
+                        medianprops=dict(color="0.3", linewidth=0.8),
+                        whiskerprops=dict(color="0.4", linewidth=0.6),
+                        capprops=dict(color="0.4", linewidth=0.6))
+
+        # Overlay biological nm as a coloured point
+        colour = "#2166ac" if cat == "neuron" else "#b2182b"
+        marker = "o" if cat == "neuron" else "^"
+        ax.scatter([i], [bio], marker=marker, s=40, c=colour,
+                   edgecolors=colour, linewidths=0.6, zorder=5)
+
+        if n >= 1000:
+            labels.append(f"{n // 1000}k")
+        else:
+            labels.append(str(n))
+
+    ax.set_xticks(positions)
+    ax.set_xticklabels(labels, rotation=45, ha="right", fontsize=7)
+    ax.set_xlabel("Tree size $n$")
+    ax.set_ylabel("Near-miss ratio nm")
+
+    # Violation threshold
+    ax.axhline(y=1.0, color="0.3", linestyle=":", linewidth=0.7, zorder=1)
+
+    ax.yaxis.grid(True, linewidth=0.3, color="0.85", zorder=0)
+    ax.xaxis.grid(False)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.tick_params(top=False, right=False)
+
+    # Legend
+    from matplotlib.lines import Line2D
+    legend_elements = [
+        Line2D([0], [0], marker="o", color="w", markerfacecolor="#2166ac",
+               markersize=6, label="Neuronal (observed)"),
+        Line2D([0], [0], marker="^", color="w", markerfacecolor="#b2182b",
+               markersize=6, label="Phylogeny (observed)"),
+        plt.Rectangle((0, 0), 1, 1, fc="#d4e6f1", ec="0.4", linewidth=0.6,
+                       label="Random tree null"),
+    ]
+    ax.legend(handles=legend_elements, loc="lower right", frameon=True,
+              framealpha=0.95, edgecolor="0.8", fancybox=False, fontsize=8)
+
+    out_path = FIGURES / "null_model_nm.pdf"
+    fig.savefig(out_path)
+    plt.close(fig)
+    print(f"Null-model comparison saved to {out_path}")
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -331,6 +522,18 @@ def main():
     print("Generating Figure 2: normalised polynomial shapes")
     print("=" * 60)
     plot_poly_shapes()
+
+    print()
+    print("=" * 60)
+    print("Generating Figure 3: P(v) vs degree scatter plot")
+    print("=" * 60)
+    plot_pv_vs_degree()
+
+    print()
+    print("=" * 60)
+    print("Generating Figure 4: null-model nm comparison")
+    print("=" * 60)
+    plot_null_model_nm()
 
     print()
     print("All outputs in:", FIGURES)
