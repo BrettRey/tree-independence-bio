@@ -29,7 +29,13 @@ TODO: Write abstract here.
 
 \section{Introduction}
 
-TODO: Write introduction here.
+Trees are everywhere in biology. Phylogenies record the branching history of species \citep{hinchliff2015synthesis}. Dendritic arbors carry signals from synapse to soma. The backbone of a transcription regulatory network, stripped of its cycles, is a tree \citep{alon2007network}. In each case the branching pattern isn't just a shape; it constrains what the system can do. This paper asks what a single polynomial can reveal about that constraint.
+
+The \term{independence polynomial} of a tree~$T$ counts the ways to select non-adjacent vertices. Call a set of vertices \term{independent} if no two are neighbours, and let $i_k(T)$ be the number of independent sets of size~$k$. The polynomial $\indpoly = \sum_k i_k(T)\, x^k$ packages these counts. \textcite{alavi1987vertex} conjectured that for every tree the coefficient sequence $i_0, i_1, \ldots$ is \term{unimodal}: it rises to a single peak and then falls. This is Erd\H{o}s Problem~993. Despite partial results \citep{chudnovsky2007roots, wagner2010maxima}, the conjecture remains open, though \textcite{reynolds2026erdos} has verified it for all 447\,672\,596 trees on at most 26~vertices.
+
+Why should biologists care about a graph-theoretic polynomial? In a protein interaction network whose local topology is tree-like \citep{milo2002network}, an independent set is a collection of proteins no two of which interact directly~-- a non-interacting module. In a dendritic arbor, it's a set of compartments that don't share a branch point. The shape of $\indpoly$~-- its mode, its width, its \term{near-miss ratio}~$\nm(T)$~-- characterises how the tree's topology distributes combinatorial freedom. The \term{hard-core model} from statistical physics \citep{galvin2004weighted, scott2005repulsive} assigns an occupation probability $\occ(v)$ to each vertex; these probabilities serve as centrality measures that reflect a vertex's role in the tree's independent-set structure.
+
+This paper applies results from a companion study \citep{reynolds2026erdos} to real biological trees. We compute independence polynomials for neuronal reconstructions from NeuroMorpho.Org \citep{ascoli2007neuromorpho} and phylogenetic trees from the Open Tree of Life \citep{hinchliff2015synthesis}, confirming unimodality and log-concavity across all specimens. We interpret three results in biological terms: the Hub Exclusion Lemma (high-degree vertices are excluded from maximal independent configurations), the hard-core edge bound ($\occ(u) + \occ(v) < 2/3$ for adjacent vertices), and the near-miss ratio as a measure of how close a tree's topology sits to the combinatorial boundary.
 
 \section{Mathematical background}
 
