@@ -24,7 +24,7 @@ Humber Polytechnic \& University of Toronto}
 \maketitle
 
 \begin{abstract}
-TODO: Write abstract here.
+The independence polynomial of a graph counts independent sets by size, packaging these counts into a single generating function whose shape encodes the graph's combinatorial structure. Trees~-- graphs with no cycles~-- are ubiquitous in biology: dendritic arbors carry signals from synapse to soma, phylogenies record the branching history of species, and transcription regulatory motifs have tree-like backbone topologies. We computed exact independence polynomials for 26 real biological trees (15 neuronal arbors from NeuroMorpho.Org and 11 phylogenies from the Open Tree of Life, ranging from 46 to 17,992 vertices). All 26 are unimodal and log-concave, extending the computational verification of a long-standing conjecture to biological data for the first time. Three structural results translate cleanly into biological terms: high-degree vertices (soma, polytomies, transcription factors) are excluded from maximal independent configurations while peripheral elements (terminal dendrites, tip species, target genes) are included; adjacent vertices are constrained by the hard-core edge bound; and the near-miss ratio quantifies how close each tree's topology sits to the combinatorial boundary. The same polynomial appears as a partition function in statistical physics and a molecular descriptor in chemical graph theory, suggesting that the independence polynomial is a natural, discipline-spanning network descriptor.
 \end{abstract}
 
 \section{Introduction}
@@ -190,7 +190,11 @@ Several empirical directions are open. The occupation probabilities $\occ(v)$ de
 
 \section{Conclusion}
 
-TODO: Write conclusion.
+We applied the independence polynomial framework developed in the companion paper \citep{reynolds2026erdos} to 26 real biological trees drawn from neuronal reconstructions and published phylogenies. All 26 are unimodal and log-concave, consistent with the exhaustive verification of every abstract tree on at most 26~vertices but now confirmed on trees two orders of magnitude larger.
+
+Three structural results carry biological content. First, the Hub Exclusion Lemma predicts that high-degree vertices~-- soma, polytomies, transcription factors~-- are absent from maximal independent configurations while their peripheral neighbours are present. Second, the hard-core edge bound $\occ(u) + \occ(v) < 2/3$ constrains co-occurrence along every edge. Third, the near-miss ratio $\nm(T)$ rises toward~1 with tree size, quantifying how close each tree sits to the combinatorial boundary without crossing it.
+
+These results suggest that the independence polynomial deserves a place alongside degree distribution and centrality measures as a network descriptor for tree-structured biological systems.
 
 \section*{Acknowledgements}
 
