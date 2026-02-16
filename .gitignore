@@ -11,5 +11,13 @@
 *.fls
 *.synctex.gz
 
+# PDF build output
+*.pdf
+# Keep figure PDFs
+!figures/*.pdf
+
 # macOS
 .DS_Store
+
+# Agent working files
+.agent/

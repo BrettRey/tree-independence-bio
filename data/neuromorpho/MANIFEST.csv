@@ -1,0 +1,16 @@
+filename,neuron_name,archive,species,cell_type,surface_area_um2,nodes,file_size_bytes,neuromorpho_id
+20_062909e_02_3rd_ddaC_A5.CNG.swc,20_062909e_02_3rd_ddaC_A5,Ye,drosophila melanogaster,sensory dendritic arborization (ddaC),77.87,113,3800,102830
+06_060609y_9-A6-ddaC.CNG.swc,06_060609y_9-A6-ddaC,Ye,drosophila melanogaster,sensory dendritic arborization (ddaC),143.35,166,5366,102827
+cnic_041.CNG.swc,cnic_041,Wearne_Hof,monkey (Macaca mulatta),pyramidal (layer 3 prefrontal),6601.59,1038,38946,10
+cnic_001.CNG.swc,cnic_001,Wearne_Hof,monkey (Macaca mulatta),pyramidal (layer 3 prefrontal),8842.91,1274,47963,1
+H17-03-010-11-13-01_656411100_m.CNG.swc,H17-03-010-11-13-01_656411100_m,Allen Cell Types,human,interneuron (aspiny),2791.48,1498,58208,102399
+Purkinje-slice-ageP35-1.CNG.swc,Purkinje-slice-ageP35-1,Dusart,mouse,Purkinje cell,25649.9,1716,63495,10073
+SM080903A2.CNG.swc,SM080903A2,Markram,rat,interneuron,3798.24,1941,72770,106287
+TypeA-10.CNG.swc,TypeA-10,Scanziani,mouse,principal cell,487.76,2212,80865,10047
+SM080902A1-5_IDC.CNG.swc,SM080902A1-5_IDC,Markram,rat,interneuron,9628.55,2774,108212,106286
+n419.CNG.swc,n419,Turner,rat,pyramidal,23909.3,4229,156021,100
+Purkinje-slice-ageP43-6.CNG.swc,Purkinje-slice-ageP43-6,Dusart,mouse,Purkinje cell,25786.9,4156,157336,10069
+5-27-11cell1-nonFS-BC.CNG.swc,5-27-11cell1-nonFS-BC,Santhakumar,rat,basket interneuron (non-fast spiking),4514.72,6378,245320,10036
+SM080902A3-1.CNG.swc,SM080902A3-1,Markram,rat,interneuron,13213.8,7649,300565,106285
+H17-03-010-11-13-06_651089035_m.CNG.swc,H17-03-010-11-13-06_651089035_m,Allen Cell Types,human,pyramidal (spiny),28371.6,10451,423890,102400
+H17-03-011-11-04-05_650978964_m.CNG.swc,H17-03-011-11-04-05_650978964_m,Allen Cell Types,human,pyramidal (spiny),32648.5,17992,739435,102401
