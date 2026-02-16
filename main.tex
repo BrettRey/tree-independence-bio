@@ -124,19 +124,43 @@ The hard-core edge bound $\occ(\mathrm{TF}) + \occ(\mathrm{target}_i) < 2/3$ con
 
 \subsection{Data and methods}
 
-TODO
+We analysed 26 biological trees drawn from two sources. From NeuroMorpho.Org \citep{ascoli2007neuromorpho} we obtained 15 neuronal reconstructions in SWC format, spanning five species (Drosophila, macaque, human, mouse, rat) and several cell types (pyramidal cells, Purkinje cells, interneurons, principal cells). Tree sizes range from $n = 113$ (Drosophila ddaC) to $n = 17{,}992$ (human pyramidal). From the Open Tree of Life \citep{hinchliff2015synthesis} we extracted 11 phylogenetic subtrees in Newick format, ranging from $n = 46$ (Homininae) to $n = 1{,}387$ (Cetacea).
+
+Independence polynomials were computed exactly using arbitrary-precision integer arithmetic via \texttt{indpoly.py}, the algorithm described in the companion paper \citep{reynolds2026erdos}. Format conversion from SWC and Newick files used \texttt{bio\_trees.py}. Runtime was sub-second for trees with $n < 1{,}000$ and approximately 19~minutes for the largest tree ($n = 17{,}992$). Table~\ref{tab:results} summarises the results for all 26~trees.
+
+\input{figures/results_table.tex}
 
 \subsection{Unimodality and log-concavity}
 
-TODO
+All 26 biological trees have unimodal and log-concave independence polynomials. This extends the exhaustive verification of all abstract trees on $\le 26$ vertices \citep{reynolds2026erdos} to real biological trees of much larger size~-- up to $n = 17{,}992$ vertices. Mode positions cluster near $\alpha/2$ (mode$/\alpha \approx 0.55$ for most trees), consistent with the symmetric bell-curve shape visible in Figure~\ref{fig:polyshapes}. Neither the neuronal arbors nor the phylogenetic trees produced any counterexample to the unimodality conjecture.
 
 \subsection{Near-miss ratio and robustness}
 
-TODO
+The \term{near-miss ratio} $\nm(T)$ ranges from 0.770 (Homininae, $n = 46$) to 0.999 (human pyramidal, $n = 17{,}992$). Figure~\ref{fig:nmvsn} shows a clear positive correlation between tree size and near-miss ratio, consistent with the asymptotic $1 - C/s$ derived in the companion paper \citep{reynolds2026erdos}.
+
+The pattern admits a clean interpretation. Larger biological trees sit closer to the combinatorial boundary~-- their coefficient sequences nearly fail to be unimodal~-- but they never cross it. We call this the \term{dilution effect}: as $n$~grows, the polynomial acquires more coefficients and the sequence smooths, making near-misses more likely but actual violations no closer. Small trees ($n < 100$) have $\nm$ well below~0.9; large trees ($n > 1{,}000$) all exceed~0.98.
+
+The two data types occupy different regions of Figure~\ref{fig:nmvsn}. Neuronal arbors, with their long chains of degree-2 vertices, tend toward higher~$\nm$ at a given~$n$ than phylogenies of comparable size. Phylogenies with many polytomies have more combinatorial structure per vertex, which keeps $\nm$ slightly lower. Both populations follow the same asymptotic envelope.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{figures/nm_vs_n.pdf}
+  \caption{Near-miss ratio $\nm(T)$ versus tree size~$n$ for 15~neuronal arbors (blue circles) and 11~phylogenetic trees (red triangles). The dashed curve shows the asymptotic envelope $1 - 6/n$. All values lie below~1, confirming unimodality.}
+  \label{fig:nmvsn}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{figures/poly_shapes.pdf}
+  \caption{Normalised independence polynomial coefficients $i_k / \max(i_k)$ versus $k/\alpha$ for four representative trees. The universal unimodal bell-curve shape is evident across both data types and a wide range of tree sizes.}
+  \label{fig:polyshapes}
+\end{figure}
 
 \subsection{Hub exclusion in biological networks}
 
-TODO
+The Hub Exclusion Lemma applies wherever a vertex has two or more leaf-children. The two data types differ in where this condition holds. Phylogenies have many hub vertices~-- polytomies where an ancestor diverges into three or more descendants simultaneously~-- so Hub Exclusion is active throughout the tree. Neuronal arbors, by contrast, consist mostly of degree-2 chains (unbranched dendritic segments) with occasional branch points, and hub exclusion applies only at those branch points.
+
+In phylogenies, unresolved radiations (polytomies with $d_{\mathrm{leaf}} \ge 2$) are structurally excluded from maximal 1-Private independent configurations while their tip species are included. This asymmetry is stronger in phylogenies than in neuronal arbors because phylogenies have higher maximum vertex degree. The observation matches biological reality in both systems: peripheral elements~-- terminal dendrites, extant species~-- carry more combinatorial weight than central hubs. The independence polynomial formalises this intuition as a theorem.
 
 \section{Discussion}
 
