@@ -5,7 +5,8 @@ Produces:
   2. Scatter plot of near-miss ratio vs n       (figures/nm_vs_n.pdf)
   3. Normalised polynomial shape overlay        (figures/poly_shapes.pdf)
   4. P(v) vs degree scatter plot                (figures/pv_vs_degree.pdf)
-  5. Null-model nm comparison box plot          (figures/null_model_nm.pdf)
+  5. nm regression with named residuals         (figures/nm_regression.pdf)
+  6. Null-model nm comparison box plot          (figures/null_model_nm.pdf)
 
 Usage:
     python generate_figures.py
@@ -18,10 +19,12 @@ from pathlib import Path
 # Paths
 PROJECT = Path(__file__).parent
 ERDOS = PROJECT.parent / "Erdos_Problem_993"
+HOUSE_STYLE = PROJECT.parent.parent / ".house-style"
 FIGURES = PROJECT / "figures"
 
 sys.path.insert(0, str(PROJECT))
 sys.path.insert(0, str(ERDOS))
+sys.path.insert(0, str(HOUSE_STYLE))
 
 from bio_trees import read_swc, read_newick
 from indpoly import independence_poly, near_miss_ratio
@@ -30,36 +33,14 @@ from occupation import occupation_probabilities
 import matplotlib
 matplotlib.use("Agg")  # non-interactive backend
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 from matplotlib.ticker import ScalarFormatter
 import numpy as np
 
+from plot_style import setup, COLORS, add_grid, save_figure
 
-# ---------------------------------------------------------------------------
-# Matplotlib style: clean, publication-quality, serif font
-# ---------------------------------------------------------------------------
-
-plt.rcParams.update({
-    "font.family": "serif",
-    "font.serif": ["STIX Two Text", "Times", "DejaVu Serif"],
-    "mathtext.fontset": "stix",
-    "font.size": 10,
-    "axes.labelsize": 11,
-    "axes.titlesize": 12,
-    "legend.fontsize": 9,
-    "xtick.labelsize": 9,
-    "ytick.labelsize": 9,
-    "axes.linewidth": 0.8,
-    "xtick.major.width": 0.6,
-    "ytick.major.width": 0.6,
-    "xtick.direction": "in",
-    "ytick.direction": "in",
-    "xtick.top": True,
-    "ytick.right": True,
-    "figure.dpi": 300,
-    "savefig.dpi": 300,
-    "savefig.bbox": "tight",
-    "savefig.pad_inches": 0.05,
-})
+# Apply house style
+setup()
 
 
 # ---------------------------------------------------------------------------
@@ -179,7 +160,6 @@ def generate_latex_table():
 
 def plot_nm_vs_n():
     """Scatter plot of near-miss ratio vs number of nodes."""
-    # Extract data
     n_neuro = [row[2] for row in NEURONS]
     nm_neuro = [row[5] for row in NEURONS]
     n_phylo = [row[1] for row in PHYLOGENIES]
@@ -187,56 +167,42 @@ def plot_nm_vs_n():
 
     fig, ax = plt.subplots(figsize=(5.5, 3.8))
 
-    # Neuronal arbors: filled circles
-    ax.scatter(n_neuro, nm_neuro, marker="o", s=36, c="#2166ac",
-               edgecolors="#2166ac", linewidths=0.6, zorder=3,
+    ax.scatter(n_neuro, nm_neuro, marker="o", s=36, c=COLORS['primary'],
+               edgecolors=COLORS['primary'], linewidths=0.6, zorder=3,
                label="Neuronal arbors")
 
-    # Phylogenies: open triangles
     ax.scatter(n_phylo, nm_phylo, marker="^", s=42, facecolors="none",
-               edgecolors="#b2182b", linewidths=1.0, zorder=3,
+               edgecolors=COLORS['secondary'], linewidths=1.0, zorder=3,
                label="Phylogenetic trees")
 
     # Reference curve: nm = 1 - C/n
     C = 6
     n_ref = np.linspace(30, 40000, 500)
     nm_ref = 1.0 - C / n_ref
-    ax.plot(n_ref, nm_ref, "--", color="0.55", linewidth=0.9, zorder=2,
-            label=f"$1 - {C}/n$")
+    ax.plot(n_ref, nm_ref, "--", color=COLORS['dark'], linewidth=0.9,
+            zorder=2, alpha=0.5, label=f"$1 - {C}/n$")
 
-    # Violation threshold
-    ax.axhline(y=1.0, color="0.3", linestyle=":", linewidth=0.7, zorder=1)
+    ax.axhline(y=1.0, color=COLORS['dark'], linestyle=":", linewidth=0.7,
+               zorder=1)
 
     ax.set_xscale("log")
     ax.set_xlim(30, 50000)
     ax.set_ylim(0.70, 1.01)
-
     ax.set_xlabel("Number of nodes $n$")
     ax.set_ylabel("Near-miss ratio nm")
 
-    # Clean up x-axis tick formatting (no scientific notation)
     ax.xaxis.set_major_formatter(ScalarFormatter())
     ax.xaxis.get_major_formatter().set_scientific(False)
     ax.xaxis.get_major_formatter().set_useOffset(False)
     ax.set_xticks([50, 100, 500, 1000, 5000, 10000, 30000])
-    ax.set_xticklabels(["50", "100", "500", "1,000", "5,000", "10,000", "30,000"])
+    ax.set_xticklabels(["50", "100", "500", "1,000", "5,000",
+                        "10,000", "30,000"])
 
-    # Minimal gridlines
-    ax.yaxis.grid(True, linewidth=0.3, color="0.85", zorder=0)
-    ax.xaxis.grid(False)
+    add_grid(ax)
+    ax.legend(loc="lower right")
 
-    ax.legend(loc="lower right", frameon=True, framealpha=0.95,
-              edgecolor="0.8", fancybox=False)
-
-    # Remove top and right spines for cleaner look
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.tick_params(top=False, right=False)
-
-    out_path = FIGURES / "nm_vs_n.pdf"
-    fig.savefig(out_path)
+    save_figure(fig, FIGURES / "nm_vs_n", formats=("pdf",))
     plt.close(fig)
-    print(f"Scatter plot saved to {out_path}")
 
 
 # ---------------------------------------------------------------------------
@@ -268,7 +234,6 @@ def _load_tree_with_meta(category, filename):
 def plot_poly_shapes():
     """Overlay normalised polynomial shapes for 4 representative trees."""
 
-    # Representative trees (category, display_name, filename)
     representatives = [
         ("phylo", "Homininae ($n=46$)", "homininae.nwk"),
         ("neuron", "Drosophila ddaC A5 ($n=113$)",
@@ -277,12 +242,11 @@ def plot_poly_shapes():
         ("neuron", "Monkey L3 pyramidal ($n=1038$)", "cnic_041.CNG.swc"),
     ]
 
-    # Line styles for visual distinction
     styles = [
-        {"color": "#d95f02", "linestyle": "-", "linewidth": 1.4},
-        {"color": "#1b9e77", "linestyle": "--", "linewidth": 1.4},
-        {"color": "#7570b3", "linestyle": "-.", "linewidth": 1.4},
-        {"color": "#e7298a", "linestyle": ":", "linewidth": 1.8},
+        {"color": COLORS['secondary'], "linestyle": "-"},
+        {"color": COLORS['tertiary'], "linestyle": "--"},
+        {"color": COLORS['quaternary'], "linestyle": "-."},
+        {"color": COLORS['quinary'], "linestyle": ":"},
     ]
 
     fig, ax = plt.subplots(figsize=(5.5, 3.8))
@@ -294,7 +258,6 @@ def plot_poly_shapes():
         alpha = len(poly) - 1
         max_coeff = max(poly)
 
-        # Normalise
         x = np.array([k / alpha for k in range(alpha + 1)])
         y = np.array([c / max_coeff for c in poly])
 
@@ -305,22 +268,11 @@ def plot_poly_shapes():
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1.05)
 
-    ax.legend(loc="upper right", frameon=True, framealpha=0.95,
-              edgecolor="0.8", fancybox=False, fontsize=8)
+    add_grid(ax)
+    ax.legend(loc="upper right", fontsize=8)
 
-    # Minimal gridlines
-    ax.yaxis.grid(True, linewidth=0.3, color="0.85", zorder=0)
-    ax.xaxis.grid(False)
-
-    # Remove top and right spines
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.tick_params(top=False, right=False)
-
-    out_path = FIGURES / "poly_shapes.pdf"
-    fig.savefig(out_path)
+    save_figure(fig, FIGURES / "poly_shapes", formats=("pdf",))
     plt.close(fig)
-    print(f"Polynomial shapes saved to {out_path}")
 
 
 # ---------------------------------------------------------------------------
@@ -328,12 +280,7 @@ def plot_poly_shapes():
 # ---------------------------------------------------------------------------
 
 def plot_pv_vs_degree():
-    """Scatter plot of occupation probability P(v) vs vertex degree.
-
-    Shows 3 representative trees (one small phylogeny, one neuronal arbor,
-    one larger phylogeny) to illustrate Hub Exclusion quantitatively:
-    high-degree vertices cluster at low P(v).
-    """
+    """Scatter plot of occupation probability P(v) vs vertex degree."""
     representatives = [
         ("phylo", "Homininae ($n=46$)", "homininae.nwk"),
         ("neuron", "Monkey L3 pyramidal ($n=1{,}038$)", "cnic_041.CNG.swc"),
@@ -342,11 +289,11 @@ def plot_pv_vs_degree():
 
     markers = [
         {"marker": "^", "s": 18, "facecolors": "none",
-         "edgecolors": "#d95f02", "linewidths": 0.7},
-        {"marker": "o", "s": 10, "facecolors": "#2166ac",
-         "edgecolors": "#2166ac", "linewidths": 0.4},
+         "edgecolors": COLORS['secondary'], "linewidths": 0.7},
+        {"marker": "o", "s": 10, "facecolors": COLORS['primary'],
+         "edgecolors": COLORS['primary'], "linewidths": 0.4},
         {"marker": "s", "s": 12, "facecolors": "none",
-         "edgecolors": "#7570b3", "linewidths": 0.7},
+         "edgecolors": COLORS['quaternary'], "linewidths": 0.7},
     ]
 
     fig, ax = plt.subplots(figsize=(5.5, 3.8))
@@ -358,42 +305,35 @@ def plot_pv_vs_degree():
         probs = occupation_probabilities(n, adj, root=root)
         degrees = [len(adj[i]) for i in range(n)]
 
-        # Jitter degree slightly for visibility
         deg_jitter = np.array(degrees) + np.random.default_rng(42).uniform(
             -0.15, 0.15, size=n)
 
         ax.scatter(deg_jitter, probs, label=label, alpha=0.6, zorder=3,
                    **mstyle)
 
-    # Reference line at P(v) = 1/3 (edge bound threshold)
-    ax.axhline(y=1 / 3, color="0.5", linestyle=":", linewidth=0.7, zorder=1)
+    # Reference line at P(v) = 1/3
+    ax.axhline(y=1 / 3, color=COLORS['dark'], linestyle=":", linewidth=0.7,
+               zorder=1, alpha=0.5)
     ax.text(ax.get_xlim()[1] * 0.85, 1 / 3 + 0.01, "$1/3$",
-            fontsize=8, color="0.5", ha="right")
+            fontsize=8, color=COLORS['dark'], alpha=0.6, ha="right")
 
     # Theoretical lower envelope: P(hub) = 1/(2^k + 1) for star K_{1,k}
     k_vals = np.arange(1, 15)
     p_star = 1.0 / (2.0 ** k_vals + 1.0)
-    ax.plot(k_vals, p_star, "-", color="#999999", linewidth=1.0, zorder=2,
-            marker=".", markersize=3, label=r"$K_{1,k}$ hub: $1/(2^k+1)$")
+    ax.plot(k_vals, p_star, "-", color=COLORS['dark'], linewidth=1.0,
+            zorder=2, alpha=0.4, marker=".", markersize=3,
+            label=r"$K_{1,k}$ hub: $1/(2^k+1)$")
 
     ax.set_xlabel("Vertex degree")
     ax.set_ylabel("Occupation probability $P(v)$")
     ax.set_xlim(0.5, None)
     ax.set_ylim(-0.01, 0.55)
 
-    ax.legend(loc="upper right", frameon=True, framealpha=0.95,
-              edgecolor="0.8", fancybox=False, fontsize=8)
+    add_grid(ax)
+    ax.legend(loc="upper right", fontsize=8)
 
-    ax.yaxis.grid(True, linewidth=0.3, color="0.85", zorder=0)
-    ax.xaxis.grid(False)
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.tick_params(top=False, right=False)
-
-    out_path = FIGURES / "pv_vs_degree.pdf"
-    fig.savefig(out_path)
+    save_figure(fig, FIGURES / "pv_vs_degree", formats=("pdf",))
     plt.close(fig)
-    print(f"P(v) vs degree saved to {out_path}")
 
 
 # ---------------------------------------------------------------------------
@@ -401,14 +341,10 @@ def plot_pv_vs_degree():
 # ---------------------------------------------------------------------------
 
 def plot_nm_regression():
-    """Two-panel figure: nm vs n with fitted 1 - C/n curve, and named residuals.
-
-    Fits nm = 1 - C/n by least squares, plots the fit, and shows each
-    biological tree's residual labelled by name.
-    """
+    """Two-panel figure: nm vs n with fitted 1 - C/n curve, and named
+    residuals."""
     from scipy.optimize import curve_fit
 
-    # Collect all data
     names, ns, nms, cats = [], [], [], []
     for row in NEURONS:
         names.append(row[0])
@@ -424,7 +360,6 @@ def plot_nm_regression():
     ns = np.array(ns, dtype=float)
     nms = np.array(nms, dtype=float)
 
-    # Fit nm = 1 - C/n
     def model(n, C):
         return 1.0 - C / n
 
@@ -434,12 +369,12 @@ def plot_nm_regression():
     nm_pred = model(ns, C_fit)
     residuals = nms - nm_pred
 
-    # R² computation
     ss_res = np.sum(residuals ** 2)
     ss_tot = np.sum((nms - np.mean(nms)) ** 2)
     r_sq = 1.0 - ss_res / ss_tot
 
-    print(f"  Fit: nm = 1 - {C_fit:.2f}/n  (SE = {C_se:.2f}, R² = {r_sq:.4f})")
+    print(f"  Fit: nm = 1 - {C_fit:.2f}/n  (SE = {C_se:.2f}, "
+          f"R\u00b2 = {r_sq:.4f})")
 
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(6.0, 5.5),
                                     height_ratios=[2, 1],
@@ -449,16 +384,18 @@ def plot_nm_regression():
     n_curve = np.linspace(30, 40000, 500)
     nm_curve = model(n_curve, C_fit)
 
-    ax1.plot(n_curve, nm_curve, "-", color="0.55", linewidth=1.0, zorder=2,
+    ax1.plot(n_curve, nm_curve, "-", color=COLORS['dark'], linewidth=1.0,
+             zorder=2, alpha=0.5,
              label=f"$1 - {C_fit:.1f}/n$  ($R^2 = {r_sq:.3f}$)")
 
     for i, cat in enumerate(cats):
-        colour = "#2166ac" if cat == "neuron" else "#b2182b"
+        colour = COLORS['primary'] if cat == "neuron" else COLORS['secondary']
         marker = "o" if cat == "neuron" else "^"
         ax1.scatter(ns[i], nms[i], marker=marker, s=30, c=colour,
                     edgecolors=colour, linewidths=0.5, zorder=3)
 
-    ax1.axhline(y=1.0, color="0.3", linestyle=":", linewidth=0.7, zorder=1)
+    ax1.axhline(y=1.0, color=COLORS['dark'], linestyle=":", linewidth=0.7,
+                zorder=1)
     ax1.set_xscale("log")
     ax1.set_xlim(30, 50000)
     ax1.set_ylim(0.70, 1.01)
@@ -467,37 +404,32 @@ def plot_nm_regression():
     ax1.xaxis.get_major_formatter().set_scientific(False)
     ax1.set_xticks([50, 100, 500, 1000, 5000, 10000, 30000])
     ax1.set_xticklabels(["50", "100", "500", "1k", "5k", "10k", "30k"])
-    ax1.yaxis.grid(True, linewidth=0.3, color="0.85", zorder=0)
-    ax1.spines["top"].set_visible(False)
-    ax1.spines["right"].set_visible(False)
-    ax1.tick_params(top=False, right=False)
+    add_grid(ax1)
 
-    # Legend entries for data types
-    from matplotlib.lines import Line2D
     legend_elements = [
-        Line2D([0], [0], marker="o", color="w", markerfacecolor="#2166ac",
-               markersize=5, label="Neuronal arbors"),
-        Line2D([0], [0], marker="^", color="w", markerfacecolor="#b2182b",
-               markersize=5, label="Phylogenies"),
-        Line2D([0], [0], color="0.55", linewidth=1.0,
+        Line2D([0], [0], marker="o", color="w",
+               markerfacecolor=COLORS['primary'], markersize=5,
+               label="Neuronal arbors"),
+        Line2D([0], [0], marker="^", color="w",
+               markerfacecolor=COLORS['secondary'], markersize=5,
+               label="Phylogenies"),
+        Line2D([0], [0], color=COLORS['dark'], linewidth=1.0, alpha=0.5,
                label=f"$1 - {C_fit:.1f}/n$  ($R^2 = {r_sq:.3f}$)"),
     ]
-    ax1.legend(handles=legend_elements, loc="lower right", frameon=True,
-               framealpha=0.95, edgecolor="0.8", fancybox=False, fontsize=8)
+    ax1.legend(handles=legend_elements, loc="lower right", fontsize=8)
 
     # --- Bottom panel: named residuals ---
-    ax2.axhline(y=0, color="0.5", linestyle="-", linewidth=0.5, zorder=1)
+    ax2.axhline(y=0, color=COLORS['dark'], linestyle="-", linewidth=0.5,
+                zorder=1, alpha=0.4)
 
     for i, cat in enumerate(cats):
-        colour = "#2166ac" if cat == "neuron" else "#b2182b"
+        colour = COLORS['primary'] if cat == "neuron" else COLORS['secondary']
         marker = "o" if cat == "neuron" else "^"
         ax2.scatter(ns[i], residuals[i], marker=marker, s=24, c=colour,
                     edgecolors=colour, linewidths=0.5, zorder=3)
 
-    # Label each point with short name
     short_names = []
     for nm in names:
-        # Abbreviate for readability
         s = nm.replace("Drosophila ddaC ", "Dros. ")
         s = s.replace("Monkey L3 pyramidal ", "Monkey ")
         s = s.replace("Human aspiny interneuron", "Hum. aspiny")
@@ -511,13 +443,12 @@ def plot_nm_regression():
         s = s.replace("Human pyramidal ", "Hum. pyr. ")
         short_names.append(s)
 
-    # Annotate with offset to reduce overlap
     for i, sn in enumerate(short_names):
         y_off = 4 if residuals[i] >= 0 else -8
         ax2.annotate(sn, (ns[i], residuals[i]),
-                     fontsize=5.0, color="0.35", ha="center",
-                     textcoords="offset points", xytext=(0, y_off),
-                     rotation=45)
+                     fontsize=5.0, color=COLORS['dark'], alpha=0.6,
+                     ha="center", textcoords="offset points",
+                     xytext=(0, y_off), rotation=45)
 
     ax2.set_xscale("log")
     ax2.set_xlim(30, 50000)
@@ -527,15 +458,10 @@ def plot_nm_regression():
     ax2.xaxis.get_major_formatter().set_scientific(False)
     ax2.set_xticks([50, 100, 500, 1000, 5000, 10000, 30000])
     ax2.set_xticklabels(["50", "100", "500", "1k", "5k", "10k", "30k"])
-    ax2.yaxis.grid(True, linewidth=0.3, color="0.85", zorder=0)
-    ax2.spines["top"].set_visible(False)
-    ax2.spines["right"].set_visible(False)
-    ax2.tick_params(top=False, right=False)
+    add_grid(ax2)
 
-    out_path = FIGURES / "nm_regression.pdf"
-    fig.savefig(out_path)
+    save_figure(fig, FIGURES / "nm_regression", formats=("pdf",))
     plt.close(fig)
-    print(f"Regression plot saved to {out_path}")
 
 
 # ---------------------------------------------------------------------------
@@ -543,12 +469,7 @@ def plot_nm_regression():
 # ---------------------------------------------------------------------------
 
 def plot_null_model_nm():
-    """Box plot comparing biological nm to null-model distributions.
-
-    Reads precomputed null-model results from JSON. Falls back to a
-    quick computation if no results file is found.
-    """
-    # Try to load precomputed results
+    """Box plot comparing biological nm to null-model distributions."""
     results_path = PROJECT / "null_model_results.json"
     if not results_path.exists():
         results_path = PROJECT / "null_model_results_quick.json"
@@ -562,7 +483,6 @@ def plot_null_model_nm():
     with open(results_path) as f:
         raw = json.load(f)
 
-    # Build biological nm lookup
     bio_nm = {}
     bio_cat = {}
     for row in NEURONS:
@@ -572,7 +492,6 @@ def plot_null_model_nm():
         bio_nm[row[1]] = row[4]
         bio_cat[row[1]] = "phylo"
 
-    # Collect Prüfer results (primary null model)
     entries = []
     for key, data in raw.items():
         if data["model"] != "prufer":
@@ -594,17 +513,19 @@ def plot_null_model_nm():
     labels = []
 
     for i, (n, null_nms, bio, cat) in enumerate(entries):
-        # Box plot for null distribution
         bp = ax.boxplot([null_nms], positions=[i], widths=0.5,
                         patch_artist=True, showfliers=False,
-                        boxprops=dict(facecolor="#d4e6f1", edgecolor="0.4",
+                        boxprops=dict(facecolor=COLORS['light'],
+                                      edgecolor=COLORS['dark'],
                                       linewidth=0.6),
-                        medianprops=dict(color="0.3", linewidth=0.8),
-                        whiskerprops=dict(color="0.4", linewidth=0.6),
-                        capprops=dict(color="0.4", linewidth=0.6))
+                        medianprops=dict(color=COLORS['dark'],
+                                         linewidth=0.8),
+                        whiskerprops=dict(color=COLORS['dark'],
+                                          linewidth=0.6),
+                        capprops=dict(color=COLORS['dark'],
+                                      linewidth=0.6))
 
-        # Overlay biological nm as a coloured point
-        colour = "#2166ac" if cat == "neuron" else "#b2182b"
+        colour = COLORS['primary'] if cat == "neuron" else COLORS['secondary']
         marker = "o" if cat == "neuron" else "^"
         ax.scatter([i], [bio], marker=marker, s=40, c=colour,
                    edgecolors=colour, linewidths=0.6, zorder=5)
@@ -619,32 +540,26 @@ def plot_null_model_nm():
     ax.set_xlabel("Tree size $n$")
     ax.set_ylabel("Near-miss ratio nm")
 
-    # Violation threshold
-    ax.axhline(y=1.0, color="0.3", linestyle=":", linewidth=0.7, zorder=1)
+    ax.axhline(y=1.0, color=COLORS['dark'], linestyle=":", linewidth=0.7,
+               zorder=1)
 
-    ax.yaxis.grid(True, linewidth=0.3, color="0.85", zorder=0)
-    ax.xaxis.grid(False)
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.tick_params(top=False, right=False)
+    add_grid(ax)
 
-    # Legend
-    from matplotlib.lines import Line2D
     legend_elements = [
-        Line2D([0], [0], marker="o", color="w", markerfacecolor="#2166ac",
-               markersize=6, label="Neuronal (observed)"),
-        Line2D([0], [0], marker="^", color="w", markerfacecolor="#b2182b",
-               markersize=6, label="Phylogeny (observed)"),
-        plt.Rectangle((0, 0), 1, 1, fc="#d4e6f1", ec="0.4", linewidth=0.6,
+        Line2D([0], [0], marker="o", color="w",
+               markerfacecolor=COLORS['primary'], markersize=6,
+               label="Neuronal (observed)"),
+        Line2D([0], [0], marker="^", color="w",
+               markerfacecolor=COLORS['secondary'], markersize=6,
+               label="Phylogeny (observed)"),
+        plt.Rectangle((0, 0), 1, 1, fc=COLORS['light'],
+                       ec=COLORS['dark'], linewidth=0.6,
                        label="Random tree null"),
     ]
-    ax.legend(handles=legend_elements, loc="lower right", frameon=True,
-              framealpha=0.95, edgecolor="0.8", fancybox=False, fontsize=8)
+    ax.legend(handles=legend_elements, loc="lower right", fontsize=8)
 
-    out_path = FIGURES / "null_model_nm.pdf"
-    fig.savefig(out_path)
+    save_figure(fig, FIGURES / "null_model_nm", formats=("pdf",))
     plt.close(fig)
-    print(f"Null-model comparison saved to {out_path}")
 
 
 # ---------------------------------------------------------------------------
