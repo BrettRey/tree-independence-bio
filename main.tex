@@ -166,15 +166,27 @@ In phylogenies, unresolved radiations (polytomies with $d_{\mathrm{leaf}} \ge 2$
 
 \subsection{The independence polynomial as a network descriptor}
 
-TODO
+Standard network descriptors~-- degree distribution, clustering coefficient, betweenness centrality~-- reduce a graph to a handful of scalars. The independence polynomial retains more. Its full coefficient sequence $i_0, i_1, \ldots, i_\alpha$ encodes how combinatorial freedom is distributed across every possible selection size, not just the mean or maximum. Mode position, near-miss ratio, and per-vertex occupation probabilities $\occ(v)$ each capture a different facet of the tree's branching topology.
+
+For trees, this richness comes at manageable cost. The companion paper's algorithm computes $\indpoly$ exactly in $O(n \cdot \alpha^2)$ time using arbitrary-precision arithmetic \citep{reynolds2026erdos}. On general graphs, computing the independence polynomial is \#P-hard; the tree case is tractable precisely because there are no cycles.
+
+The polynomial functions as a topological fingerprint. Two trees with the same degree sequence can have different independence polynomials, and vice versa. This makes $\indpoly$ complementary to existing descriptors rather than redundant. Because many biological networks are locally tree-like~-- protein interaction networks have tree-like backbones \citep{milo2002network}, regulatory cascades are acyclic~-- the structural results proved for exact trees (hub exclusion, edge bound, near-miss asymptotics) apply at least locally to a broader class of biological networks.
 
 \subsection{Universality: physics, chemistry, biology}
 
-TODO
+The independence polynomial sits at a crossroads of three disciplines. In statistical physics, $\indpoly$ is the partition function of the \term{hard-core lattice gas} at fugacity~$x$. The structural constraints proved in the companion paper~-- the edge bound $\occ(u) + \occ(v) < 2/3$, the Hub Exclusion Lemma~-- are statements about this model on tree-structured lattices \citep{galvin2004weighted, scott2005repulsive}.
+
+In chemical graph theory, the single evaluation $I(G;\, 1)$ counts all independent sets of~$G$ and is called the \term{Merrifield--Simmons index} $\sigma(G)$. \textcite{hosoya1971topological} introduced the closely related topological index~$Z(G)$ for matchings, and \textcite{merrifield1989topological} studied $\sigma(G)$ as a molecular descriptor for acyclic hydrocarbons. Both indices have been investigated as predictors of thermodynamic properties in chemical graph theory, though the full polynomial $\indpoly$ carries richer information than any single evaluation.
+
+This paper extends the framework to biology. The structural results~-- hub exclusion, the edge bound, near-miss asymptotics~-- are new contributions from the companion paper \citep{reynolds2026erdos}, and they apply across all three domains. What changes between domains is the interpretation: fugacity in physics, molecular topology in chemistry, branching architecture in biology.
 
 \subsection{Limitations and open questions}
 
-TODO
+The unimodality conjecture for tree independence polynomials remains unproved. It has been verified exhaustively for all 447\,672\,596 abstract trees on at most 26~vertices and confirmed for all 26~biological trees in this study, but a general proof is still missing. The conjecture's status limits the theoretical claims we can make: every structural result conditional on unimodality inherits this gap.
+
+Real biological networks are rarely exact trees. Dendritic arbors have gap junctions; phylogenies have reticulation events; regulatory networks have feedback loops. Extending the present results to graphs of bounded treewidth is a natural next step, since many of the algorithmic and structural properties of trees generalise to that setting.
+
+Several empirical directions are open. The occupation probabilities $\occ(v)$ deserve systematic comparison with existing centrality measures across large datasets. A full analysis of NeuroMorpho.Org's 260\,000+ reconstructions \citep{ascoli2007neuromorpho} is computationally feasible and would strengthen the empirical base considerably. Finally, the connection between $\nm(T)$ and network robustness~-- whether trees near the unimodality boundary are structurally fragile in some biological sense~-- deserves further investigation.
 
 \section{Conclusion}
 
