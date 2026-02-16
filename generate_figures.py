@@ -111,6 +111,7 @@ PHYLOGENIES = [
     ("Papilionidae", 1170, 929, 472, 0.9917, "papilionidae.nwk"),
     ("Primates", 1333, 872, 452, 0.9941, "primates.nwk"),
     ("Cetacea", 1387, 971, 498, 0.9911, "cetacea.nwk"),
+    ("Aves", 30310, 20357, 10532, 0.9997, "aves.nwk"),
 ]
 
 
@@ -194,7 +195,7 @@ def plot_nm_vs_n():
 
     # Reference curve: nm = 1 - C/n
     C = 6
-    n_ref = np.linspace(30, 20000, 500)
+    n_ref = np.linspace(30, 40000, 500)
     nm_ref = 1.0 - C / n_ref
     ax.plot(n_ref, nm_ref, "--", color="0.55", linewidth=0.9, zorder=2,
             label=f"$1 - {C}/n$")
@@ -203,7 +204,7 @@ def plot_nm_vs_n():
     ax.axhline(y=1.0, color="0.3", linestyle=":", linewidth=0.7, zorder=1)
 
     ax.set_xscale("log")
-    ax.set_xlim(30, 25000)
+    ax.set_xlim(30, 50000)
     ax.set_ylim(0.70, 1.01)
 
     ax.set_xlabel("Number of nodes $n$")
@@ -213,8 +214,8 @@ def plot_nm_vs_n():
     ax.xaxis.set_major_formatter(ScalarFormatter())
     ax.xaxis.get_major_formatter().set_scientific(False)
     ax.xaxis.get_major_formatter().set_useOffset(False)
-    ax.set_xticks([50, 100, 500, 1000, 5000, 10000])
-    ax.set_xticklabels(["50", "100", "500", "1,000", "5,000", "10,000"])
+    ax.set_xticks([50, 100, 500, 1000, 5000, 10000, 30000])
+    ax.set_xticklabels(["50", "100", "500", "1,000", "5,000", "10,000", "30,000"])
 
     # Minimal gridlines
     ax.yaxis.grid(True, linewidth=0.3, color="0.85", zorder=0)

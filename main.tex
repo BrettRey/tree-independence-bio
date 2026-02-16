@@ -24,7 +24,7 @@ Humber Polytechnic \& University of Toronto}
 \maketitle
 
 \begin{abstract}
-The independence polynomial of a graph counts independent sets by size, packaging these counts into a single generating function whose shape encodes the graph's combinatorial structure. Trees~-- graphs with no cycles~-- are ubiquitous in biology: dendritic arbors carry signals from synapse to soma, phylogenies record the branching history of species, and transcription regulatory motifs have tree-like backbone topologies. We computed exact independence polynomials for 26 real biological trees (15 neuronal arbors from NeuroMorpho.Org and 11 phylogenies from the Open Tree of Life, ranging from 46 to 17,992 vertices). All 26 are unimodal and log-concave, extending the computational verification of a long-standing conjecture to biological data for the first time. Three structural results translate cleanly into biological terms: high-degree vertices (soma, polytomies, transcription factors) are excluded from maximal independent configurations while peripheral elements (terminal dendrites, tip species, target genes) are included; adjacent vertices are constrained by the hard-core edge bound; and the near-miss ratio quantifies how close each tree's topology sits to the combinatorial boundary. The same polynomial appears as a partition function in statistical physics and a molecular descriptor in chemical graph theory, suggesting that the independence polynomial is a natural, discipline-spanning network descriptor.
+The independence polynomial of a graph counts independent sets by size, packaging these counts into a single generating function whose shape encodes the graph's combinatorial structure. Trees~-- graphs with no cycles~-- are ubiquitous in biology: dendritic arbors carry signals from synapse to soma, phylogenies record the branching history of species, and transcription regulatory motifs have tree-like backbone topologies. We computed exact independence polynomials for 27 real biological trees (15 neuronal arbors from NeuroMorpho.Org and 12 phylogenies from the Open Tree of Life, ranging from 46 to 30,310 vertices). All 27 are unimodal and log-concave, extending the computational verification of a long-standing conjecture to biological data for the first time. Three structural results translate cleanly into biological terms: high-degree vertices (soma, polytomies, transcription factors) are excluded from maximal independent configurations while peripheral elements (terminal dendrites, tip species, target genes) are included; adjacent vertices are constrained by the hard-core edge bound; and the near-miss ratio quantifies how close each tree's topology sits to the combinatorial boundary. The same polynomial appears as a partition function in statistical physics and a molecular descriptor in chemical graph theory, suggesting that the independence polynomial is a natural, discipline-spanning network descriptor.
 \end{abstract}
 
 \section{Introduction}
@@ -124,19 +124,19 @@ The hard-core edge bound $\occ(\mathrm{TF}) + \occ(\mathrm{target}_i) < 2/3$ con
 
 \subsection{Data and methods}
 
-We analysed 26 biological trees drawn from two sources. From NeuroMorpho.Org \citep{ascoli2007neuromorpho} we obtained 15 neuronal reconstructions in SWC format, spanning five species (Drosophila, macaque, human, mouse, rat) and several cell types (pyramidal cells, Purkinje cells, interneurons, principal cells). Tree sizes range from $n = 113$ (Drosophila ddaC) to $n = 17{,}992$ (human pyramidal). From the Open Tree of Life \citep{hinchliff2015synthesis} we extracted 11 phylogenetic subtrees in Newick format, ranging from $n = 46$ (Homininae) to $n = 1{,}387$ (Cetacea).
+We analysed 27 biological trees drawn from two sources. From NeuroMorpho.Org \citep{ascoli2007neuromorpho} we obtained 15 neuronal reconstructions in SWC format, spanning five species (Drosophila, macaque, human, mouse, rat) and several cell types (pyramidal cells, Purkinje cells, interneurons, principal cells). Tree sizes range from $n = 113$ (Drosophila ddaC) to $n = 17{,}992$ (human pyramidal). From the Open Tree of Life \citep{hinchliff2015synthesis} we extracted 12 phylogenetic subtrees in Newick format, ranging from $n = 46$ (Homininae) to $n = 30{,}310$ (Aves).
 
-Independence polynomials were computed exactly using arbitrary-precision integer arithmetic via \texttt{indpoly.py}, the algorithm described in the companion paper \citep{reynolds2026erdos}. Format conversion from SWC and Newick files used \texttt{bio\_trees.py}. Runtime was sub-second for trees with $n < 1{,}000$ and approximately 19~minutes for the largest tree ($n = 17{,}992$). Table~\ref{tab:results} summarises the results for all 26~trees.
+Independence polynomials were computed exactly using arbitrary-precision integer arithmetic via \texttt{indpoly.py}, the algorithm described in the companion paper \citep{reynolds2026erdos}. Format conversion from SWC and Newick files used \texttt{bio\_trees.py}. Runtime was sub-second for trees with $n < 1{,}000$ and approximately 142~minutes for the largest tree ($n = 30{,}310$). Table~\ref{tab:results} summarises the results for all 27~trees.
 
 \input{figures/results_table.tex}
 
 \subsection{Unimodality and log-concavity}
 
-All 26 biological trees have unimodal and log-concave independence polynomials. This extends the exhaustive verification of all abstract trees on $\le 26$ vertices \citep{reynolds2026erdos} to real biological trees of much larger size~-- up to $n = 17{,}992$ vertices. Mode positions cluster near $\alpha/2$ (mode$/\alpha \approx 0.55$ for most trees), consistent with the symmetric bell-curve shape visible in Figure~\ref{fig:polyshapes}. Neither the neuronal arbors nor the phylogenetic trees produced any counterexample to the unimodality conjecture.
+All 27 biological trees have unimodal and log-concave independence polynomials. This extends the exhaustive verification of all abstract trees on $\le 26$ vertices \citep{reynolds2026erdos} to real biological trees of much larger size~-- up to $n = 30{,}310$ vertices. Mode positions cluster near $\alpha/2$ (mode$/\alpha \approx 0.55$ for most trees), consistent with the symmetric bell-curve shape visible in Figure~\ref{fig:polyshapes}. Neither the neuronal arbors nor the phylogenetic trees produced any counterexample to the unimodality conjecture.
 
 \subsection{Near-miss ratio and robustness}
 
-The \term{near-miss ratio} $\nm(T)$ ranges from 0.770 (Homininae, $n = 46$) to 0.999 (human pyramidal, $n = 17{,}992$). Figure~\ref{fig:nmvsn} shows a clear positive correlation between tree size and near-miss ratio, consistent with the asymptotic $1 - C/s$ derived in the companion paper \citep{reynolds2026erdos}.
+The \term{near-miss ratio} $\nm(T)$ ranges from 0.770 (Homininae, $n = 46$) to 0.9997 (Aves, $n = 30{,}310$). Figure~\ref{fig:nmvsn} shows a clear positive correlation between tree size and near-miss ratio, consistent with the asymptotic $1 - C/s$ derived in the companion paper \citep{reynolds2026erdos}.
 
 The pattern admits a clean interpretation. Larger biological trees sit closer to the combinatorial boundary~-- their coefficient sequences nearly fail to be unimodal~-- but they never cross it. We call this the \term{dilution effect}: as $n$~grows, the polynomial acquires more coefficients and the sequence smooths, making near-misses more likely but actual violations no closer. Small trees ($n < 100$) have $\nm$ well below~0.9; large trees ($n > 1{,}000$) all exceed~0.98.
 
@@ -145,7 +145,7 @@ The two data types occupy different regions of Figure~\ref{fig:nmvsn}. Neuronal 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth]{figures/nm_vs_n.pdf}
-  \caption{Near-miss ratio $\nm(T)$ versus tree size~$n$ for 15~neuronal arbors (blue circles) and 11~phylogenetic trees (red triangles). The dashed curve shows the asymptotic envelope $1 - 6/n$. All values lie below~1, confirming unimodality.}
+  \caption{Near-miss ratio $\nm(T)$ versus tree size~$n$ for 15~neuronal arbors (blue circles) and 12~phylogenetic trees (red triangles). The dashed curve shows the asymptotic envelope $1 - 6/n$. All values lie below~1, confirming unimodality.}
   \label{fig:nmvsn}
 \end{figure}
 
@@ -182,7 +182,7 @@ This paper extends the framework to biology. The structural results~-- hub exclu
 
 \subsection{Limitations and open questions}
 
-The unimodality conjecture for tree independence polynomials remains unproved. It has been verified exhaustively for all 447\,672\,596 abstract trees on at most 26~vertices and confirmed for all 26~biological trees in this study, but a general proof is still missing. The conjecture's status limits the theoretical claims we can make: every structural result conditional on unimodality inherits this gap.
+The unimodality conjecture for tree independence polynomials remains unproved. It has been verified exhaustively for all 447\,672\,596 abstract trees on at most 26~vertices and confirmed for all 27~biological trees in this study, but a general proof is still missing. The conjecture's status limits the theoretical claims we can make: every structural result conditional on unimodality inherits this gap.
 
 Real biological networks are rarely exact trees. Dendritic arbors have gap junctions; phylogenies have reticulation events; regulatory networks have feedback loops. Extending the present results to graphs of bounded treewidth is a natural next step, since many of the algorithmic and structural properties of trees generalise to that setting.
 
@@ -190,7 +190,7 @@ Several empirical directions are open. The occupation probabilities $\occ(v)$ de
 
 \section{Conclusion}
 
-We applied the independence polynomial framework developed in the companion paper \citep{reynolds2026erdos} to 26 real biological trees drawn from neuronal reconstructions and published phylogenies. All 26 are unimodal and log-concave, consistent with the exhaustive verification of every abstract tree on at most 26~vertices but now confirmed on trees two orders of magnitude larger.
+We applied the independence polynomial framework developed in the companion paper \citep{reynolds2026erdos} to 27 real biological trees drawn from neuronal reconstructions and published phylogenies. All 27 are unimodal and log-concave, consistent with the exhaustive verification of every abstract tree on at most 26~vertices but now confirmed on trees two orders of magnitude larger.
 
 Three structural results carry biological content. First, the Hub Exclusion Lemma predicts that high-degree vertices~-- soma, polytomies, transcription factors~-- are absent from maximal independent configurations while their peripheral neighbours are present. Second, the hard-core edge bound $\occ(u) + \occ(v) < 2/3$ constrains co-occurrence along every edge. Third, the near-miss ratio $\nm(T)$ rises toward~1 with tree size, quantifying how close each tree sits to the combinatorial boundary without crossing it.
 
