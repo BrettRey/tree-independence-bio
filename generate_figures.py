@@ -370,6 +370,12 @@ def plot_pv_vs_degree():
     ax.text(ax.get_xlim()[1] * 0.85, 1 / 3 + 0.01, "$1/3$",
             fontsize=8, color="0.5", ha="right")
 
+    # Theoretical lower envelope: P(hub) = 1/(2^k + 1) for star K_{1,k}
+    k_vals = np.arange(1, 15)
+    p_star = 1.0 / (2.0 ** k_vals + 1.0)
+    ax.plot(k_vals, p_star, "-", color="#999999", linewidth=1.0, zorder=2,
+            marker=".", markersize=3, label=r"$K_{1,k}$ hub: $1/(2^k+1)$")
+
     ax.set_xlabel("Vertex degree")
     ax.set_ylabel("Occupation probability $P(v)$")
     ax.set_xlim(0.5, None)
@@ -391,7 +397,149 @@ def plot_pv_vs_degree():
 
 
 # ---------------------------------------------------------------------------
-# 5. Null-model nm comparison
+# 5. nm regression with named residuals
+# ---------------------------------------------------------------------------
+
+def plot_nm_regression():
+    """Two-panel figure: nm vs n with fitted 1 - C/n curve, and named residuals.
+
+    Fits nm = 1 - C/n by least squares, plots the fit, and shows each
+    biological tree's residual labelled by name.
+    """
+    from scipy.optimize import curve_fit
+
+    # Collect all data
+    names, ns, nms, cats = [], [], [], []
+    for row in NEURONS:
+        names.append(row[0])
+        ns.append(row[2])
+        nms.append(row[5])
+        cats.append("neuron")
+    for row in PHYLOGENIES:
+        names.append(row[0])
+        ns.append(row[1])
+        nms.append(row[4])
+        cats.append("phylo")
+
+    ns = np.array(ns, dtype=float)
+    nms = np.array(nms, dtype=float)
+
+    # Fit nm = 1 - C/n
+    def model(n, C):
+        return 1.0 - C / n
+
+    popt, pcov = curve_fit(model, ns, nms, p0=[6.0])
+    C_fit = popt[0]
+    C_se = np.sqrt(pcov[0, 0])
+    nm_pred = model(ns, C_fit)
+    residuals = nms - nm_pred
+
+    # R² computation
+    ss_res = np.sum(residuals ** 2)
+    ss_tot = np.sum((nms - np.mean(nms)) ** 2)
+    r_sq = 1.0 - ss_res / ss_tot
+
+    print(f"  Fit: nm = 1 - {C_fit:.2f}/n  (SE = {C_se:.2f}, R² = {r_sq:.4f})")
+
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(6.0, 5.5),
+                                    height_ratios=[2, 1],
+                                    gridspec_kw={"hspace": 0.35})
+
+    # --- Top panel: nm vs n with fit ---
+    n_curve = np.linspace(30, 40000, 500)
+    nm_curve = model(n_curve, C_fit)
+
+    ax1.plot(n_curve, nm_curve, "-", color="0.55", linewidth=1.0, zorder=2,
+             label=f"$1 - {C_fit:.1f}/n$  ($R^2 = {r_sq:.3f}$)")
+
+    for i, cat in enumerate(cats):
+        colour = "#2166ac" if cat == "neuron" else "#b2182b"
+        marker = "o" if cat == "neuron" else "^"
+        ax1.scatter(ns[i], nms[i], marker=marker, s=30, c=colour,
+                    edgecolors=colour, linewidths=0.5, zorder=3)
+
+    ax1.axhline(y=1.0, color="0.3", linestyle=":", linewidth=0.7, zorder=1)
+    ax1.set_xscale("log")
+    ax1.set_xlim(30, 50000)
+    ax1.set_ylim(0.70, 1.01)
+    ax1.set_ylabel("Near-miss ratio nm")
+    ax1.xaxis.set_major_formatter(ScalarFormatter())
+    ax1.xaxis.get_major_formatter().set_scientific(False)
+    ax1.set_xticks([50, 100, 500, 1000, 5000, 10000, 30000])
+    ax1.set_xticklabels(["50", "100", "500", "1k", "5k", "10k", "30k"])
+    ax1.yaxis.grid(True, linewidth=0.3, color="0.85", zorder=0)
+    ax1.spines["top"].set_visible(False)
+    ax1.spines["right"].set_visible(False)
+    ax1.tick_params(top=False, right=False)
+
+    # Legend entries for data types
+    from matplotlib.lines import Line2D
+    legend_elements = [
+        Line2D([0], [0], marker="o", color="w", markerfacecolor="#2166ac",
+               markersize=5, label="Neuronal arbors"),
+        Line2D([0], [0], marker="^", color="w", markerfacecolor="#b2182b",
+               markersize=5, label="Phylogenies"),
+        Line2D([0], [0], color="0.55", linewidth=1.0,
+               label=f"$1 - {C_fit:.1f}/n$  ($R^2 = {r_sq:.3f}$)"),
+    ]
+    ax1.legend(handles=legend_elements, loc="lower right", frameon=True,
+               framealpha=0.95, edgecolor="0.8", fancybox=False, fontsize=8)
+
+    # --- Bottom panel: named residuals ---
+    ax2.axhline(y=0, color="0.5", linestyle="-", linewidth=0.5, zorder=1)
+
+    for i, cat in enumerate(cats):
+        colour = "#2166ac" if cat == "neuron" else "#b2182b"
+        marker = "o" if cat == "neuron" else "^"
+        ax2.scatter(ns[i], residuals[i], marker=marker, s=24, c=colour,
+                    edgecolors=colour, linewidths=0.5, zorder=3)
+
+    # Label each point with short name
+    short_names = []
+    for nm in names:
+        # Abbreviate for readability
+        s = nm.replace("Drosophila ddaC ", "Dros. ")
+        s = s.replace("Monkey L3 pyramidal ", "Monkey ")
+        s = s.replace("Human aspiny interneuron", "Hum. aspiny")
+        s = s.replace("Mouse Purkinje ", "Purk. ")
+        s = s.replace("Rat interneuron (IDC)", "Rat IDC")
+        s = s.replace("Rat interneuron (A3)", "Rat A3")
+        s = s.replace("Rat interneuron", "Rat int.")
+        s = s.replace("Rat pyramidal (n419)", "Rat pyr.")
+        s = s.replace("Rat basket interneuron", "Rat basket")
+        s = s.replace("Mouse principal cell", "Mouse princ.")
+        s = s.replace("Human pyramidal ", "Hum. pyr. ")
+        short_names.append(s)
+
+    # Annotate with offset to reduce overlap
+    for i, sn in enumerate(short_names):
+        y_off = 4 if residuals[i] >= 0 else -8
+        ax2.annotate(sn, (ns[i], residuals[i]),
+                     fontsize=5.0, color="0.35", ha="center",
+                     textcoords="offset points", xytext=(0, y_off),
+                     rotation=45)
+
+    ax2.set_xscale("log")
+    ax2.set_xlim(30, 50000)
+    ax2.set_xlabel("Number of nodes $n$")
+    ax2.set_ylabel("Residual")
+    ax2.xaxis.set_major_formatter(ScalarFormatter())
+    ax2.xaxis.get_major_formatter().set_scientific(False)
+    ax2.set_xticks([50, 100, 500, 1000, 5000, 10000, 30000])
+    ax2.set_xticklabels(["50", "100", "500", "1k", "5k", "10k", "30k"])
+    ax2.yaxis.grid(True, linewidth=0.3, color="0.85", zorder=0)
+    ax2.spines["top"].set_visible(False)
+    ax2.spines["right"].set_visible(False)
+    ax2.tick_params(top=False, right=False)
+
+    out_path = FIGURES / "nm_regression.pdf"
+    fig.savefig(out_path)
+    plt.close(fig)
+    print(f"Regression plot saved to {out_path}")
+
+
+# ---------------------------------------------------------------------------
+# 6. Null-model nm comparison
 # ---------------------------------------------------------------------------
 
 def plot_null_model_nm():
@@ -531,7 +679,13 @@ def main():
 
     print()
     print("=" * 60)
-    print("Generating Figure 4: null-model nm comparison")
+    print("Generating Figure 4: nm regression with named residuals")
+    print("=" * 60)
+    plot_nm_regression()
+
+    print()
+    print("=" * 60)
+    print("Generating Figure 5: null-model nm comparison")
     print("=" * 60)
     plot_null_model_nm()
 

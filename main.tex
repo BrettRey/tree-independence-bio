@@ -83,18 +83,18 @@ All 27 biological trees have unimodal and log-concave independence polynomials. 
 
 \subsection{Near-miss ratio and robustness}
 
-The \term{near-miss ratio} $\nm(T)$ ranges from 0.770 (Homininae, $n = 46$) to 0.9997 (Aves, $n = 30{,}310$). Figure~\ref{fig:nmvsn} shows a clear positive correlation between tree size and near-miss ratio, consistent with the asymptotic $1 - C/s$ derived in the companion paper \citep{reynolds2026erdos}.
+The \term{near-miss ratio} $\nm(T)$ ranges from 0.770 (Homininae, $n = 46$) to 0.9997 (Aves, $n = 30{,}310$). A least-squares fit gives $\nm = 1 - 10.8/n$ ($R^2 = 0.934$, Figure~\ref{fig:nmvsn}), consistent with the asymptotic $1 - C/s$ derived in the companion paper \citep{reynolds2026erdos}. (The fitted constant is larger than the theoretical $C \in [4, 8)$ because the asymptotic uses the pendant count~$s$, not the total vertex count~$n$.)
 
 The pattern admits a clean interpretation. Larger biological trees sit closer to the combinatorial boundary~-- their coefficient sequences nearly fail to be unimodal~-- but they never cross it. We call this the \term{dilution effect}: as $n$~grows, the polynomial acquires more coefficients and the sequence smooths, making near-misses more likely but actual violations no closer. Small trees ($n < 100$) have $\nm$ well below~0.9; large trees ($n > 1{,}000$) all exceed~0.98.
 
 The two data types occupy different regions of Figure~\ref{fig:nmvsn}. Neuronal arbors, with their long chains of degree-2 vertices, tend toward higher~$\nm$ at a given~$n$ than phylogenies of comparable size. Phylogenies with many polytomies have more combinatorial structure per vertex, which keeps $\nm$ slightly lower. Both populations follow the same asymptotic envelope.
 
-The correlation is strong and statistically robust. Spearman's $\rho = 0.973$ (95\% CI $[0.899,\, 0.993]$, $p < 0.001$, $n = 27$) for the pooled sample; within neurons alone $\rho = 0.989$ ($p < 0.001$, $n = 15$) and within phylogenies $\rho = 0.965$ ($p < 0.001$, $n = 12$). The near-miss ratio also correlates with standard tree-shape statistics: Sackin index ($\rho = 0.924$, $p < 0.001$) and Colless-like index ($\rho = 0.937$, $p < 0.001$), but not with leaf count ($\rho = 0.361$, $p = 0.064$). This last non-result is informative: $\nm$ tracks overall tree size, not the number of tips specifically.
+The correlation is strong and statistically robust. Spearman's $\rho = 0.973$ (95\% CI $[0.899,\, 0.993]$, $p < 0.001$, $n = 27$) for the pooled sample; within neurons alone $\rho = 0.989$ ($p < 0.001$, $n = 15$) and within phylogenies $\rho = 0.965$ ($p < 0.001$, $n = 12$). The near-miss ratio also correlates with standard tree-shape statistics: Sackin index ($\rho = 0.924$, $p < 0.001$) and Colless-like index ($\rho = 0.937$, $p < 0.001$), but not with leaf count ($\rho = 0.361$, $p = 0.064$). This non-result is consistent with the hub-pendant asymptotic $\nm(s) = 1 - C/s$ derived in the companion paper, where $s$ is the total pendant count, not the leaf count: $\nm$ tracks tree size and branching structure, not the number of tips specifically.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{figures/nm_vs_n.pdf}
-  \caption{Near-miss ratio $\nm(T)$ versus tree size~$n$ for 15~neuronal arbors (blue circles) and 12~phylogenetic trees (red triangles). The dashed curve shows the asymptotic envelope $1 - 6/n$. All values lie below~1, confirming unimodality.}
+  \includegraphics[width=\textwidth]{figures/nm_regression.pdf}
+  \caption{Near-miss ratio $\nm(T)$ versus tree size~$n$ for 27~biological trees. \textit{Top:} least-squares fit $\nm = 1 - 10.8/n$ ($R^2 = 0.934$). Blue circles: neuronal arbors; red triangles: phylogenies. \textit{Bottom:} residuals from the fit, labelled by tree. Phylogenies with heavy polytomies (Equidae, Salamandridae) tend to fall below the curve; long-chain neuronal arbors tend to sit above it.}
   \label{fig:nmvsn}
 \end{figure}
 
@@ -132,7 +132,7 @@ Does the near-miss ratio of biological trees differ from what random trees of th
 
 The answer is mixed. For most tree sizes, the biological $\nm$ falls within the interquartile range of the null distribution. The near-miss ratio is driven primarily by tree size, not by the specific branching topology: a random tree with $n = 1{,}000$ vertices has $\nm \approx 0.987$, close to the biological values at that size. This result strengthens the $1 - C/n$ asymptotic (Section~\ref{sec:nearmiss}): the convergence toward~1 is a generic property of large trees, not a consequence of biological architecture.
 
-A few phylogenies with heavy polytomies (Homininae, Delphinidae) fall slightly below the null median, consistent with the observation in Section~3.3 that polytomy-rich phylogenies have lower~$\nm$ at a given~$n$. But the deviations are modest, and no biological tree is an outlier relative to its null distribution.
+A few phylogenies with heavy polytomies (Homininae, Delphinidae) fall slightly below the null median, consistent with the observation in Section~3.3 that polytomy-rich phylogenies have lower~$\nm$ at a given~$n$. But the deviations are modest, and no biological tree is an outlier relative to its null distribution. The Prüfer-sequence null is conservative: it samples uniformly over all labelled trees, including topologies (long paths, high-degree stars) that no biological process would produce. A null model matched to a biologically plausible generating process~-- Yule branching for phylogenies, or constrained-degree models for dendrites~-- might reveal deviations that the uniform null obscures.
 
 \begin{figure}[htbp]
   \centering
@@ -149,26 +149,26 @@ All 13 are unimodal and log-concave. The largest, CRP ($N = 73$ targets), has $\
 
 \begin{table}[htbp]
 \centering
-\caption{Independence polynomial properties of \textit{E.\@ coli} SIMs. $N$~= number of target operons, $n = N + 1$~= total vertices. Fan-out data from \textcite{alon2007network}.}
+\caption{Independence polynomial properties of \textit{E.\@ coli} SIMs. $N$~= number of target operons, $n = N + 1$~= total vertices. $\occ(\mathrm{TF}) = 1/(2^N + 1)$. Fan-out data from \textcite{alon2007network}.}
 \label{tab:sims}
 \small
-\begin{tabular}{@{}lrrrrr@{}}
+\begin{tabular}{@{}lrrrrl@{}}
 \toprule
-TF & $N$ & $\alpha$ & mode & $\nm$ & $\occ(\mathrm{TF})$ \\
+TF & $N$ & $\alpha$ & mode & $\nm$ & $\log_{10}\occ(\mathrm{TF})$ \\
 \midrule
-CRP & 73 & 73 & 36 & 0.8974 & $\approx 0$ \\
-FNR & 27 & 27 & 13 & 0.7500 & 0.0000 \\
-IHF & 18 & 18 & 9 & 0.7273 & 0.0000 \\
-LexA & 16 & 16 & 8 & 0.7000 & 0.0000 \\
-Fis & 16 & 16 & 8 & 0.7000 & 0.0000 \\
-ArcA & 15 & 15 & 7 & 0.6000 & 0.0000 \\
-Lrp & 13 & 13 & 6 & 0.5556 & 0.0001 \\
-NarL & 11 & 11 & 5 & 0.5000 & 0.0005 \\
-PurR & 10 & 10 & 5 & 0.5714 & 0.0010 \\
-ArgR & 9 & 9 & 4 & 0.4286 & 0.0019 \\
-FlhDC & 8 & 8 & 4 & 0.5000 & 0.0039 \\
-MetJ & 7 & 7 & 3 & 0.3333 & 0.0078 \\
-TrpR & 4 & 4 & 2 & 0.2500 & 0.0588 \\
+CRP & 73 & 73 & 36 & 0.8974 & $-22.0$ \\
+FNR & 27 & 27 & 13 & 0.7500 & $-8.1$ \\
+IHF & 18 & 18 & 9 & 0.7273 & $-5.4$ \\
+LexA & 16 & 16 & 8 & 0.7000 & $-4.8$ \\
+Fis & 16 & 16 & 8 & 0.7000 & $-4.8$ \\
+ArcA & 15 & 15 & 7 & 0.6000 & $-4.5$ \\
+Lrp & 13 & 13 & 6 & 0.5556 & $-3.9$ \\
+NarL & 11 & 11 & 5 & 0.5000 & $-3.3$ \\
+PurR & 10 & 10 & 5 & 0.5714 & $-3.0$ \\
+ArgR & 9 & 9 & 4 & 0.4286 & $-2.7$ \\
+FlhDC & 8 & 8 & 4 & 0.5000 & $-2.4$ \\
+MetJ & 7 & 7 & 3 & 0.3333 & $-2.1$ \\
+TrpR & 4 & 4 & 2 & 0.2500 & $-1.2$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -236,9 +236,9 @@ Standard network descriptors~-- degree distribution, clustering coefficient, bet
 
 For trees, this richness comes at manageable cost. The companion paper's algorithm computes $\indpoly$ exactly in $O(n \cdot \alpha^2)$ time using arbitrary-precision arithmetic \citep{reynolds2026erdos}. On general graphs, computing the independence polynomial is \#P-hard; the tree case is tractable precisely because there are no cycles.
 
-The polynomial functions as a topological fingerprint. Two trees with the same degree sequence can have different independence polynomials, and vice versa. This makes $\indpoly$ complementary to existing descriptors rather than redundant. Because many biological networks are locally tree-like~-- protein interaction networks have tree-like backbones \citep{milo2002network}, regulatory cascades are acyclic~-- the structural results proved for exact trees suggest analogous constraints in these networks, though extending the proofs beyond exact trees remains open (see Section~\ref{sec:limitations}).
+The polynomial functions as a topological fingerprint.\footnote{The independence polynomial is not a complete graph invariant: non-isomorphic trees can share the same polynomial. It is, nonetheless, finer than the degree sequence alone.} Two trees with the same degree sequence can have different independence polynomials, and vice versa. This makes $\indpoly$ complementary to existing descriptors rather than redundant. Because many biological networks are locally tree-like~-- protein interaction networks have tree-like backbones \citep{milo2002network}, regulatory cascades are acyclic~-- the structural results proved for exact trees suggest analogous constraints in these networks, though extending the proofs beyond exact trees remains open (see Section~\ref{sec:limitations}).
 
-\subsection{Universality: physics, chemistry, biology}
+\subsection{Cross-disciplinary connections}
 
 The independence polynomial sits at a crossroads of three disciplines. In statistical physics, $\indpoly$ is the partition function of the \term{hard-core lattice gas} at fugacity $\lambda = x$. The structural constraints proved in the companion paper~-- the edge bound $\occ(u) + \occ(v) < 2/3$, the Hub Exclusion Lemma~-- are statements about this model on tree-structured lattices \citep{galvin2004weighted, scott2005repulsive}.
 
@@ -252,7 +252,7 @@ The unimodality conjecture for tree independence polynomials remains unproved. I
 
 Real biological networks are rarely exact trees. Dendritic arbors have gap junctions; phylogenies have reticulation events; regulatory networks have feedback loops. Extending the present results to graphs of bounded treewidth is a natural next step. The algorithm generalises directly via dynamic programming on tree decompositions, but the structural results (Hub Exclusion, the edge bound) rely on tree-specific arguments and don't obviously carry over.
 
-Several empirical directions are open. The occupation probabilities $\occ(v)$ computed here (Section~3.5) show a clear inverse relationship with vertex degree, but a systematic comparison with established centrality measures (betweenness, closeness, eigenvector centrality) across large datasets would clarify whether $\occ(v)$ captures genuinely new structural information. A full analysis of NeuroMorpho.Org's 260\,000+ reconstructions \citep{ascoli2007neuromorpho} is computationally feasible and would strengthen the empirical base considerably. The null-model result (Section~3.6)~-- that biological $\nm$ is indistinguishable from random trees of the same size~-- suggests that if the independence polynomial captures biologically meaningful structure, it's through the per-vertex probabilities rather than the global near-miss ratio. Finally, extending the analysis from exact trees to graphs of bounded treewidth would bring the framework closer to the messy reality of biological networks with their feedback loops and gap junctions.
+Several empirical directions are open. The occupation probabilities $\occ(v)$ computed here (Section~3.5) show a clear inverse relationship with vertex degree, but for phylogenies the biological interpretation remains thin: that $\occ(v) = 0.023$ for a polytomy root doesn't correspond to any obvious evolutionary process, and saying that the vertex is \enquote{rarely included in a random independent set} adds no phylogenetic insight beyond what degree alone tells us. A systematic comparison with established centrality measures (betweenness, closeness, eigenvector centrality) across large datasets would clarify whether $\occ(v)$ captures genuinely new structural information. A full analysis of NeuroMorpho.Org's 260\,000+ reconstructions \citep{ascoli2007neuromorpho} is computationally feasible and would strengthen the empirical base considerably. The null-model result (Section~3.6)~-- that biological $\nm$ is indistinguishable from random trees of the same size~-- suggests that if the independence polynomial captures biologically meaningful structure, it's through the per-vertex probabilities rather than the global near-miss ratio. An open question with direct biological relevance is whether independence polynomial features can discriminate between generating processes at fixed~$n$~-- for instance, distinguishing Yule-process phylogenies from coalescent trees, or random branching dendrites from reconstructed arbors. Finally, extending the analysis from exact trees to graphs of bounded treewidth would bring the framework closer to the messy reality of biological networks with their feedback loops and gap junctions.
 
 \section{Conclusion}
 
