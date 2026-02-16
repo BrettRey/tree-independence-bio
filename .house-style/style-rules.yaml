@@ -1,0 +1,260 @@
+version: "1.0.0"
+name: "Brett Reynolds House Style"
+description: "LaTeX and writing conventions for linguistic typology papers"
+
+# LaTeX conventions
+latex:
+  semantic_macros:
+    rule: "Use semantic macros for all metalinguistic typography"
+    macros:
+      term:
+        command: "\\term{}"
+        rendering: "small caps"
+        usage: "Concepts and categories being introduced or defined"
+        example: "The notion of \\term{definiteness} is complex."
+      mention:
+        command: "\\mention{}"
+        rendering: "italics"
+        usage: "Words or expressions under discussion (body text)"
+        example: "The determinative \\mention{the} is not always definite."
+      mentionhead:
+        command: "\\mentionhead{}"
+        rendering: "angle brackets ⟨ ⟩"
+        usage: "Mentions inside headings (\\section, \\subsection, etc.)"
+        example: "\\subsection{The unstable case: \\mentionhead{folks}}"
+        rationale: "Italics don't contrast in small-caps headings; angle brackets do"
+      olang:
+        command: "\\olang{}"
+        rendering: "italics"
+        usage: "Object language (foreign words, cited forms)"
+        example: "German \\olang{der Hund} 'the dog'"
+      enquote:
+        command: "\\enquote{}"
+        rendering: "locale-aware curly quotes"
+        usage: "Actual quotations"
+        example: "As \\enquote{going forward} spread in business English..."
+    incorrect:
+      - "Raw \\textit{word} instead of \\mention{} or \\term{}"
+      - "\\mention{} inside a heading instead of \\mentionhead{}"
+      - "Straight quotes or LaTeX backtick quotes instead of \\enquote{}"
+
+  dashes:
+    parenthetical:
+      rule: "Use en dash with spaces for parenthetical asides"
+      example: "the category is stable~-- within limits~-- across registers"
+    range:
+      rule: "Use en dash (no spaces) for ranges and relations"
+      examples:
+        - "2001--2025"
+        - "pp.\\ 113--127"
+        - "the form--function distinction"
+    hyphen:
+      rule: "Use hyphen only for compound modifiers"
+      examples:
+        - "corpus-based study"
+        - "task-specific rubric"
+
+  cross_linguistic_notation:
+    rule: "Use subscripts to distinguish cross-linguistic from language-specific"
+    cross_linguistic:
+      marker: "\\textsubscript{\\Cross}"
+      examples:
+        - "\\textsc{subject}\\crossmark"
+        - "\\textsc{topic}\\crossmark"
+        - "\\textsc{noun}\\crossmark"
+    language_specific:
+      marker: "\\textsubscript{eng}, \\textsubscript{jpn}, etc."
+      examples:
+        - "\\textsc{subject}\\textsubscript{eng}"
+        - "\\textsc{topic}\\textsubscript{jpn}"
+    language_internal:
+      marker: "\\textsubscript{$L$}"
+      usage: "Generic reference without naming specific language"
+
+  examples:
+    package: "langsci-gb4e"
+    no_exe_environment: true
+    commands:
+      simple: "\\ea ... \\z"
+      subexamples: "\\ea \\ea ... \\ex ... \\z \\z"
+      gloss: "\\gll ... \\\\ ... \\\\ \\glt ..."
+    judgements:
+      ungrammatical: "\\ungram{*sentence}"
+      marginal: "\\marg{?sentence}"
+      odd: "\\odd{\\#sentence}"
+
+# Writing style
+prose:
+  contractions:
+    rule: "preferred"
+    rationale: "Makes prose more natural and readable"
+    examples:
+      - "don't"
+      - "won't"
+      - "can't"
+
+  paragraph_length:
+    target: 60
+    max: 100
+    rule: "Keep paragraphs under 100 words on average; aim for ~60"
+    note: "Dense 200+ word paragraphs should be broken into 2-4 shorter units"
+
+  avoid:
+    throat_clearers:
+      - "It is important to note that"
+      - "It should be emphasized that"
+      - "Clearly"
+      - "Obviously"
+    meta_commentary_labels:
+      - "A note on X:..."
+      - "A caveat on..."
+      - "An aside on..."
+      - "A word about..."
+      rule: "Just say the thing directly or integrate into prose"
+    paragraph_headings:
+      rule: "Never use \\paragraph{} headings"
+      instead: "Use strong topic sentences and discourse markers"
+    bold_labels:
+      rule: "Avoid bold labels in prose for enumeration"
+      example_wrong: "**Observation 1.** The first point..."
+      example_right: "First, the diagnostic features must cluster..."
+    hackneyed_adverbs:
+      - "moreover"
+      - "furthermore"
+      - "nevertheless"
+      - "however (sentence-initial)"
+    strong_modals:
+      rule: "Prefer should/would over must"
+      example_wrong: "The features must cluster reliably"
+      example_right: "The features should cluster reliably"
+
+  prefer:
+    direct_style:
+      - "direct verbs"
+      - "short clauses"
+      - "active voice where appropriate"
+    coordinators:
+      - "and"
+      - "but"
+      note: "Simple coordinators over hackneyed adverbs"
+    ordinal_markers:
+      sequence:
+        - "first"
+        - "second"
+        - "third"
+      alternatives:
+        - "one [concern]"
+        - "another"
+        - "a final [point]"
+    discourse_markers:
+      objections:
+        - "A first objection concerns..."
+        - "A second question asks..."
+        - "A related worry..."
+      illustrations:
+        - "Consider first..."
+        - "A second illustration..."
+        - "The clearest case..."
+    concrete_before_abstract:
+      rule: "Introduce technical apparatus with concrete examples or plain-language motivation"
+
+# Citations (biblatex with natbib=true)
+citations:
+  parenthetical:
+    command: "\\citep{key}"
+    example: "\\citep{HuddlestonPullum2002}"
+  textual:
+    command: "\\textcite{key}"
+    example: "\\textcite{Pullum2018}"
+  multiple:
+    command: "\\citep{key1,key2}"
+    example: "\\citep{HuddlestonPullum2002,Pullum2018}"
+  with_page:
+    command: "\\citep[page]{key}"
+    example: "\\citep[113--127]{HuddlestonPullum2002}"
+
+# Document structure
+document_structure:
+  sections:
+    allowed:
+      - "\\section{}"
+      - "\\subsection{}"
+    avoid:
+      - "\\paragraph{}"
+    note: "Keep subsections to substantial content (3+ paragraphs)"
+
+  lists:
+    use_for:
+      - "hypothesis or prediction lists"
+      - "linguistic examples (gb4e)"
+      - "codebook entries"
+    avoid_for:
+      - "argumentative sequences (use prose with transitions)"
+      - "objection-reply pairs (use discourse markers)"
+      - "before/after contrasts (use narrative)"
+
+  transitions:
+    rule: "Use ordinal markers and discourse connectives for flow"
+    sequence:
+      - "first, second, third"
+      - "one [concern], another, a final [point]"
+    objections:
+      - "A first objection concerns..."
+      - "A second question..."
+      - "Finally, does..."
+    illustrations:
+      - "Consider first..."
+      - "A second illustration..."
+
+# Dual-audience accessibility
+accessibility:
+  paragraph_length:
+    average: 60
+    rationale: "Shorter paragraphs improve readability across disciplines"
+
+  parenthetical_glosses:
+    rule: "Add brief functional explanations for technical terms"
+    examples:
+      - "latent variables (quantities representing unobserved category strength)"
+      - "Spearman's ρ (a rank correlation measure)"
+      - "differential object marking (where only some objects trigger case)"
+
+  concrete_before_abstract:
+    rule: "Introduce technical apparatus with concrete examples first"
+
+# Comparanda terminology
+comparanda:
+  terminology:
+    function: "syntactic functions only (unqualified)"
+    target: "semantic targets"
+    role: "discourse/pragmatic roles"
+    category: "lexical categories or phrasal projections"
+
+  mappings:
+    note: "Remind readers that mappings between axes are rarely one-to-one"
+
+# BibTeX conventions
+bibtex:
+  capital_protection:
+    rule: "Protect capitals in proper nouns and first words after colons"
+    protect:
+      - "Proper nouns: {Cambridge}, {English}, {American}"
+      - "First word after colon: {Syntactic}, {A}, {An}"
+      - "Acronyms: {HPC}, {DOM}"
+    dont_protect:
+      - "Common nouns, adjectives, verbs (unless part of proper noun)"
+      - "Title-initial words (BibTeX handles automatically)"
+    examples:
+      - "title = {The {Cambridge} Grammar of the {English} Language}"
+      - "title = {Radical Construction Grammar: {Syntactic} Theory...}"
+
+# Enforcement
+enforcement:
+  mode: "warning"  # warning, strict, or disabled
+  auto_fix: false
+  checks:
+    - "semantic_macros"
+    - "mention_in_headings"
+    - "paragraph_headings"
+    - "prohibited_phrases"
+    - "cross_ling_notation"
