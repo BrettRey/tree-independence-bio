@@ -43,9 +43,9 @@ This paper applies results from a companion study \citep{reynolds2026erdos} to r
 
 Dendritic trees are literal trees. The standard SWC file format used by NeuroMorpho.Org \citep{ascoli2007neuromorpho} encodes each neuronal reconstruction as a rooted tree: every compartment (a short cylinder of membrane) is a vertex, and edges record the parent-child relationship along the dendrite. The graph has no cycles by construction.
 
-An independent set in a dendritic tree is a collection of compartments no two of which share a branch segment~-- non-adjacent functional units. The Hub Exclusion Lemma (stated formally in Section~\ref{sec:1private}) makes a structural prediction here: high-branching points (the soma, primary bifurcations) have multiple leaf-children and so are excluded from any 1-Private maximal independent set, while their terminal dendrites are automatically included. This matches biological intuition. Terminal arbors are the \enquote{active} sites~-- they receive synaptic input and initiate local dendritic computation~-- whereas branch points serve a structural, routing role.
+The branching pattern of a dendrite constrains which compartments can act independently. An independent set in a dendritic tree is a collection of compartments no two of which share a branch segment~-- non-adjacent functional units. The Hub Exclusion Lemma (Section~\ref{sec:1private}) makes a structural prediction here: high-branching points (the soma, primary bifurcations) have multiple leaf-children and so are excluded from any 1-Private maximal independent set~-- one in which no vertex monopolises more than one excluded neighbour~-- while their terminal dendrites are automatically included. This matches biological intuition. Terminal arbors are the \enquote{active} sites~-- they receive synaptic input and initiate local dendritic computation~-- whereas branch points serve a structural, routing role.
 
-The hard-core edge bound (Section~\ref{sec:hardcore}) reinforces the picture. For any parent-child pair along the dendrite, $\occ(\text{parent}) + \occ(\text{child}) < 2/3$: the occupation probabilities of adjacent compartments can't both be high. The independence polynomial thus quantifies a topological constraint that biologists already sense informally: branching architecture partitions the arbor into zones of combinatorial freedom concentrated at the periphery.
+The hard-core edge bound (Section~\ref{sec:hardcore}) reinforces the picture. For any parent-child pair along the dendrite, $\occ(\text{parent}) + \occ(\text{child}) < 2/3$: the \term{occupation probabilities}~-- the probability that a given vertex belongs to a randomly chosen independent set~-- of adjacent compartments can't both be high. The independence polynomial thus quantifies a topological constraint that biologists already sense informally: branching architecture partitions the arbor into zones of combinatorial freedom concentrated at the periphery.
 
 \subsection{Phylogenetic trees}
 
@@ -59,9 +59,9 @@ The independence polynomial $\indpoly$ encodes the combinatorial structure of ev
 
 \term{Single-Input Modules} (SIMs) are among the most common motifs in transcription regulatory networks: one transcription factor (TF) regulates $N$~target genes \citep{alon2007network, milo2002network}. Topologically, a SIM is a star~-- a tree with one hub and $N$~leaves. This makes it the simplest non-trivial case for the independence polynomial framework.
 
-Hub Exclusion applies directly. The TF is the hub vertex with $d_{\mathrm{leaf}} = N \ge 2$ leaf-children, so it's excluded from every 1-Private maximal independent set; the targets are all included. This mirrors the biological logic of a SIM: the target genes can be independently active (expressed or not), but the regulator's state constrains the whole module. The regulator isn't \enquote{free} in the way the targets are.
+Hub Exclusion applies directly. The TF is the hub vertex with $d_{\mathrm{leaf}} = N \ge 2$ leaf-children, so it's excluded from every 1-Private maximal independent set (Section~\ref{sec:1private}); the targets are all included. This mirrors the biological logic of a SIM: the target genes can be independently active (expressed or not), but the regulator's state constrains the whole module. The regulator isn't \enquote{free} in the way the targets are.
 
-The hard-core edge bound $\occ(\mathrm{TF}) + \occ(\mathrm{target}_i) < 2/3$ constrains co-occurrence between the regulator and any one of its targets. In the hard-core model, the TF has low occupation probability (it belongs to few independent sets relative to the total) while each target has high occupation probability. For a star $K_{1,N}$, the TF's occupation probability is $1/(2^N + 1)$, which drops toward zero as $N$ grows. The targets collectively dominate the independent-set structure~-- exactly the asymmetry that makes SIMs function as regulatory amplifiers.
+The hard-core edge bound $\occ(\mathrm{TF}) + \occ(\mathrm{target}_i) < 2/3$ constrains co-occurrence between the regulator and any one of its targets. In the hard-core model, the TF has low occupation probability (it belongs to few independent sets relative to the total) while each target has high occupation probability. For a star $K_{1,N}$, the TF's occupation probability is $1/(2^N + 1)$, which drops toward zero as $N$ grows: a TF with 5~targets has occupation probability just $1/33 \approx 0.03$. The targets collectively dominate the independent-set structure~-- exactly the asymmetry that makes SIMs function as regulatory amplifiers.
 
 \section{Computational results}
 
@@ -107,9 +107,11 @@ In phylogenies, unresolved radiations (polytomies with $d_{\mathrm{leaf}} \ge 2$
 
 \section{Mathematical framework}
 
+This section collects the formal definitions and results used informally in Sections~2 and~3. Readers comfortable with the intuitive descriptions there can skip ahead to the Discussion.
+
 \subsection{Independence polynomials and unimodality}
 
-A \term{graph} $G = (V, E)$ is a set of \term{vertices}~$V$ and a set of \term{edges}~$E$, each edge joining two vertices. A \term{tree} is a connected graph with no cycles. An \term{independent set} in~$G$ is a subset $S \subseteq V$ in which no two vertices share an edge. The \term{independence number} $\alpha(G)$ is the size of a largest independent set.
+A \term{graph} $G = (V, E)$ is a set of \term{vertices}~$V$ and a set of \term{edges}~$E$, each edge joining two vertices. A \term{tree} is a connected graph with no cycles. An \term{independent set} in~$G$ is a subset $S \subseteq V$ in which no two vertices share an edge (in a biological tree, a collection of nodes no two of which share a branch). The \term{independence number} $\alpha(G)$ is the size of a largest independent set.
 
 Write $i_k(G)$ for the number of independent sets of size~$k$, with $i_0 = 1$ (the empty set). The \term{independence polynomial} is
 \[
@@ -125,7 +127,7 @@ A stronger property is \term{log-concavity}: $i_k^2 \ge i_{k-1}\, i_{k+1}$ for a
 
 The \term{hard-core model} at fugacity $\lambda = 1$ places a uniform distribution over all independent sets of~$T$. Each independent set is equally likely. This model originates in statistical physics, where it describes non-overlapping particle occupation on a lattice; here the lattice is a tree \citep{galvin2004weighted, scott2005repulsive}.
 
-Under this distribution, the \term{occupation probability} of a vertex~$v$ is $\occ(v) = \Pr[v \in S]$, the probability that~$v$ belongs to a uniformly random independent set. These probabilities serve as a kind of centrality measure: $\occ(v)$ reflects how strongly the tree's topology favours including~$v$ in an independent configuration.
+Under this distribution, the \term{occupation probability} of a vertex~$v$ is $\occ(v) = \Pr[v \in S]$, the probability that~$v$ belongs to a uniformly random independent set (how likely a given node is to appear in a random non-interacting configuration). These probabilities serve as a kind of centrality measure: $\occ(v)$ reflects how strongly the tree's topology favours including~$v$ in an independent configuration.
 
 The expected size of a random independent set is
 \[
