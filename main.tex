@@ -37,72 +37,15 @@ Why should biologists care about a graph-theoretic polynomial? In a protein inte
 
 This paper applies results from a companion study \citep{reynolds2026erdos} to real biological trees. We compute independence polynomials for neuronal reconstructions from NeuroMorpho.Org \citep{ascoli2007neuromorpho} and phylogenetic trees from the Open Tree of Life \citep{hinchliff2015synthesis}, confirming unimodality and log-concavity across all specimens. We interpret three results in biological terms: the Hub Exclusion Lemma (high-degree vertices are excluded from maximal independent configurations), the hard-core edge bound ($\occ(u) + \occ(v) < 2/3$ for adjacent vertices), and the near-miss ratio as a measure of how close a tree's topology sits to the combinatorial boundary.
 
-\section{Mathematical background}
-
-\subsection{Independence polynomials and unimodality}
-
-A \term{graph} $G = (V, E)$ is a set of \term{vertices}~$V$ and a set of \term{edges}~$E$, each edge joining two vertices. A \term{tree} is a connected graph with no cycles. An \term{independent set} in~$G$ is a subset $S \subseteq V$ in which no two vertices share an edge. The \term{independence number} $\alpha(G)$ is the size of a largest independent set.
-
-Write $i_k(G)$ for the number of independent sets of size~$k$, with $i_0 = 1$ (the empty set). The \term{independence polynomial} is
-\[
-  \indpoly \;=\; \sum_{k=0}^{\alpha(T)} i_k(T)\, x^k.
-\]
-This polynomial packages all the independent-set counts into a single object. Its coefficient sequence $i_0, i_1, \ldots, i_{\alpha}$ is \term{unimodal} if it rises to a single peak and then falls: there's an index~$p$ (the \term{mode}) with $i_0 \le i_1 \le \cdots \le i_p \ge i_{p+1} \ge \cdots \ge i_\alpha$.
-
-\textcite{alavi1987vertex} conjectured that every tree's independence polynomial is unimodal. Despite decades of partial results~-- including special cases such as paths, caterpillars, and spiders~-- the conjecture remains open \citep{wagner2010maxima}. \textcite{reynolds2026erdos} verified it computationally for all 447\,672\,596 trees on at most 26~vertices.
-
-A stronger property is \term{log-concavity}: $i_k^2 \ge i_{k-1}\, i_{k+1}$ for all~$k$. Log-concavity implies unimodality, but not conversely. \textcite{chudnovsky2007roots} proved that independence polynomials of claw-free graphs are real-rooted, which forces log-concavity for that class. But trees aren't generally claw-free, and at $n = 26$ two trees have log-concavity failures~-- yet both remain unimodal \citep{reynolds2026erdos}.
-
-\subsection{The hard-core model}
-
-The \term{hard-core model} at fugacity $\lambda = 1$ places a uniform distribution over all independent sets of~$T$. Each independent set is equally likely. This model originates in statistical physics, where it describes non-overlapping particle occupation on a lattice; here the lattice is a tree \citep{galvin2004weighted, scott2005repulsive}.
-
-Under this distribution, the \term{occupation probability} of a vertex~$v$ is $\occ(v) = \Pr[v \in S]$, the probability that~$v$ belongs to a uniformly random independent set. These probabilities serve as a kind of centrality measure: $\occ(v)$ reflects how strongly the tree's topology favours including~$v$ in an independent configuration.
-
-The expected size of a random independent set is
-\[
-  \mu \;=\; \sum_{v \in V} \occ(v) \;=\; \frac{I'(T;\, 1)}{I(T;\, 1)},
-\]
-where $I'$ is the derivative. This connects the polynomial's analytic properties to a statistical quantity: $\mu$ is the mean of the coefficient distribution, weighted by the $i_k$.
-
-The companion paper proves a structural constraint on adjacent occupation probabilities. For any edge $uv$ in a tree on $n \ge 3$ vertices,
-\[
-  \occ(u) + \occ(v) \;<\; \frac{2}{3}.
-\]
-This \term{edge bound} has an immediate consequence: the set $\{v : \occ(v) > 1/3\}$ is automatically an independent set, since two adjacent vertices can't both exceed~$1/3$. High-probability vertices repel each other. In biological terms, if two proteins interact directly, they can't both be highly likely members of a random non-interacting module.
-
-\subsection{Structural reduction: the 1-Private framework}
-
-The companion paper develops a structural reduction that isolates the combinatorially hardest trees. The key concept is that of a \term{private neighbour}. Given a maximal independent set~$S$, a non-$S$ vertex~$w$ is \term{private} to $u \in S$ if $u$ is the only $S$-member adjacent to~$w$. A maximal independent set is \term{1-Private} if every vertex in~$S$ has at most one private neighbour.
-
-Write $d_{\mathrm{leaf}}(v)$ for the number of leaf-children of vertex~$v$. The \term{Hub Exclusion Lemma} constrains how high-degree vertices interact with 1-Private independent sets.
-
-\medskip
-\noindent\textbf{Hub Exclusion Lemma} \citep{reynolds2026erdos}.
-\textit{If $d_{\mathrm{leaf}}(v) \ge 2$ and $S$ is a 1-Private maximal independent set, then $v \notin S$, and all leaf-children of~$v$ lie in~$S$.}
-\medskip
-
-The logic is direct: if~$v$ were in~$S$, each of its $\ge 2$ leaf-children would be private to~$v$, violating the 1-Private bound. Since $v \notin S$, domination forces every leaf-child into~$S$.
-
-The \term{Transfer Lemma} ensures this reduction propagates. Pruning a hub~$v$ together with its leaf-children produces a residual tree (or forest)~$T'$, and the restriction $S' = S \cap V(T')$ remains a 1-Private maximal independent set in~$T'$. Iterating over all hubs with $d_{\mathrm{leaf}} \ge 2$ terminates at a residual in which every vertex has at most one leaf-child~-- a structurally simpler class of trees.
-
-The reduction has practical implications for biological networks. Hub vertices in protein interaction networks~-- proteins with many single-degree interaction partners~-- are automatically excluded from 1-Private configurations while their partners are included. This parallels the empirical observation that hub proteins tend to be regulated rather than regulators.
-
-Finally, the \term{near-miss ratio} $\nm(T)$ quantifies how close a tree sits to the unimodality boundary. Let $j_0$ be the first index where $i_{j_0} > i_{j_0+1}$ (the first strict descent in the coefficient sequence). Then
-\[
-  \nm(T) \;=\; \max_{j > j_0} \frac{i_{j+1}(T)}{i_j(T)}.
-\]
-A value exceeding~1 would be a unimodality violation; values near~1 indicate the tree's topology nearly permits one. The companion paper shows that for trees obtained by attaching $s$~pendant leaves to a fixed hub, $\nm(s) = 1 - C/s + O(1/s^2)$ with $C \in [4, 8)$. The margin shrinks as~$s$ grows but doesn't vanish.
-
-\section{Biological trees as independence structures}
+\section{Independent sets in biological trees}
 
 \subsection{Neuronal dendritic arbors}
 
 Dendritic trees are literal trees. The standard SWC file format used by NeuroMorpho.Org \citep{ascoli2007neuromorpho} encodes each neuronal reconstruction as a rooted tree: every compartment (a short cylinder of membrane) is a vertex, and edges record the parent-child relationship along the dendrite. The graph has no cycles by construction.
 
-An independent set in a dendritic tree is a collection of compartments no two of which share a branch segment~-- non-adjacent functional units. The Hub Exclusion Lemma makes a structural prediction here: high-branching points (the soma, primary bifurcations) have multiple leaf-children and so are excluded from any 1-Private maximal independent set, while their terminal dendrites are automatically included. This matches biological intuition. Terminal arbors are the \enquote{active} sites~-- they receive synaptic input and initiate local dendritic computation~-- whereas branch points serve a structural, routing role.
+An independent set in a dendritic tree is a collection of compartments no two of which share a branch segment~-- non-adjacent functional units. The Hub Exclusion Lemma (stated formally in Section~\ref{sec:1private}) makes a structural prediction here: high-branching points (the soma, primary bifurcations) have multiple leaf-children and so are excluded from any 1-Private maximal independent set, while their terminal dendrites are automatically included. This matches biological intuition. Terminal arbors are the \enquote{active} sites~-- they receive synaptic input and initiate local dendritic computation~-- whereas branch points serve a structural, routing role.
 
-The hard-core edge bound reinforces the picture. For any parent-child pair along the dendrite, $\occ(\text{parent}) + \occ(\text{child}) < 2/3$: the occupation probabilities of adjacent compartments can't both be high. The independence polynomial thus quantifies a topological constraint that biologists already sense informally: branching architecture partitions the arbor into zones of combinatorial freedom concentrated at the periphery.
+The hard-core edge bound (Section~\ref{sec:hardcore}) reinforces the picture. For any parent-child pair along the dendrite, $\occ(\text{parent}) + \occ(\text{child}) < 2/3$: the occupation probabilities of adjacent compartments can't both be high. The independence polynomial thus quantifies a topological constraint that biologists already sense informally: branching architecture partitions the arbor into zones of combinatorial freedom concentrated at the periphery.
 
 \subsection{Phylogenetic trees}
 
@@ -110,7 +53,7 @@ Phylogenies are trees by definition. Tips represent extant species; internal nod
 
 The independence polynomial $\indpoly$ encodes the combinatorial structure of evolutionary branching. Each coefficient $i_k$ counts the number of ways to select $k$ non-adjacent nodes in the phylogeny. The shape of the polynomial~-- its mode, width, near-miss ratio~-- characterises properties of the branching pattern that aren't captured by standard measures like balance or gamma statistics.
 
-\term{Polytomies} (unresolved branching events where an ancestor splits into three or more descendants simultaneously) are the hubs where Hub Exclusion applies. A polytomy with $d_{\mathrm{leaf}} \ge 2$ descendant tips is excluded from every 1-Private maximal independent set; its tip descendants are included instead. Tip species dominate the independent-set structure, while deep ancestors with many descendants don't participate. The near-miss ratio $\nm(T)$ characterises how \enquote{robust} the phylogeny's combinatorial structure is: values near~1 indicate the branching pattern sits close to the unimodality boundary, suggesting a topology where adding or removing a single edge could shift the polynomial's shape.
+\term{Polytomies} (unresolved branching events where an ancestor splits into three or more descendants simultaneously) are the hubs where Hub Exclusion applies. A polytomy with $d_{\mathrm{leaf}} \ge 2$ descendant tips is excluded from every 1-Private maximal independent set (Section~\ref{sec:1private}); its tip descendants are included instead. Tip species dominate the independent-set structure, while deep ancestors with many descendants don't participate. The near-miss ratio $\nm(T)$ (defined in Section~\ref{sec:1private}) characterises how \enquote{robust} the phylogeny's combinatorial structure is: values near~1 indicate the branching pattern sits close to the unimodality boundary, suggesting a topology where adding or removing a single edge could shift the polynomial's shape.
 
 \subsection{Transcription regulatory motifs}
 
@@ -161,6 +104,63 @@ The two data types occupy different regions of Figure~\ref{fig:nmvsn}. Neuronal 
 The Hub Exclusion Lemma applies wherever a vertex has two or more leaf-children. The two data types differ in where this condition holds. Phylogenies have many hub vertices~-- polytomies where an ancestor diverges into three or more descendants simultaneously~-- so Hub Exclusion is active throughout the tree. Neuronal arbors, by contrast, consist mostly of degree-2 chains (unbranched dendritic segments) with occasional branch points, and hub exclusion applies only at those branch points.
 
 In phylogenies, unresolved radiations (polytomies with $d_{\mathrm{leaf}} \ge 2$) are structurally excluded from maximal 1-Private independent configurations while their tip species are included. This asymmetry is stronger in phylogenies than in neuronal arbors because phylogenies have higher maximum vertex degree. The observation matches biological reality in both systems: peripheral elements~-- terminal dendrites, extant species~-- carry more combinatorial weight than central hubs. The independence polynomial formalises this intuition as a theorem.
+
+\section{Mathematical framework}
+
+\subsection{Independence polynomials and unimodality}
+
+A \term{graph} $G = (V, E)$ is a set of \term{vertices}~$V$ and a set of \term{edges}~$E$, each edge joining two vertices. A \term{tree} is a connected graph with no cycles. An \term{independent set} in~$G$ is a subset $S \subseteq V$ in which no two vertices share an edge. The \term{independence number} $\alpha(G)$ is the size of a largest independent set.
+
+Write $i_k(G)$ for the number of independent sets of size~$k$, with $i_0 = 1$ (the empty set). The \term{independence polynomial} is
+\[
+  \indpoly \;=\; \sum_{k=0}^{\alpha(T)} i_k(T)\, x^k.
+\]
+This polynomial packages all the independent-set counts into a single object. Its coefficient sequence $i_0, i_1, \ldots, i_{\alpha}$ is \term{unimodal} if it rises to a single peak and then falls: there's an index~$p$ (the \term{mode}) with $i_0 \le i_1 \le \cdots \le i_p \ge i_{p+1} \ge \cdots \ge i_\alpha$.
+
+\textcite{alavi1987vertex} conjectured that every tree's independence polynomial is unimodal. Despite decades of partial results~-- including special cases such as paths, caterpillars, and spiders~-- the conjecture remains open \citep{wagner2010maxima}. \textcite{reynolds2026erdos} verified it computationally for all 447\,672\,596 trees on at most 26~vertices.
+
+A stronger property is \term{log-concavity}: $i_k^2 \ge i_{k-1}\, i_{k+1}$ for all~$k$. Log-concavity implies unimodality, but not conversely. \textcite{chudnovsky2007roots} proved that independence polynomials of claw-free graphs are real-rooted, which forces log-concavity for that class. But trees aren't generally claw-free, and at $n = 26$ two trees have log-concavity failures~-- yet both remain unimodal \citep{reynolds2026erdos}.
+
+\subsection{The hard-core model}\label{sec:hardcore}
+
+The \term{hard-core model} at fugacity $\lambda = 1$ places a uniform distribution over all independent sets of~$T$. Each independent set is equally likely. This model originates in statistical physics, where it describes non-overlapping particle occupation on a lattice; here the lattice is a tree \citep{galvin2004weighted, scott2005repulsive}.
+
+Under this distribution, the \term{occupation probability} of a vertex~$v$ is $\occ(v) = \Pr[v \in S]$, the probability that~$v$ belongs to a uniformly random independent set. These probabilities serve as a kind of centrality measure: $\occ(v)$ reflects how strongly the tree's topology favours including~$v$ in an independent configuration.
+
+The expected size of a random independent set is
+\[
+  \mu \;=\; \sum_{v \in V} \occ(v) \;=\; \frac{I'(T;\, 1)}{I(T;\, 1)},
+\]
+where $I'$ is the derivative. This connects the polynomial's analytic properties to a statistical quantity: $\mu$ is the mean of the coefficient distribution, weighted by the $i_k$.
+
+The companion paper proves a structural constraint on adjacent occupation probabilities. For any edge $uv$ in a tree on $n \ge 3$ vertices,
+\[
+  \occ(u) + \occ(v) \;<\; \frac{2}{3}.
+\]
+This \term{edge bound} has an immediate consequence: the set $\{v : \occ(v) > 1/3\}$ is automatically an independent set, since two adjacent vertices can't both exceed~$1/3$. High-probability vertices repel each other. In biological terms, if two proteins interact directly, they can't both be highly likely members of a random non-interacting module.
+
+\subsection{Structural reduction: the 1-Private framework}\label{sec:1private}
+
+The companion paper develops a structural reduction that isolates the combinatorially hardest trees. The key concept is that of a \term{private neighbour}. Given a maximal independent set~$S$, a non-$S$ vertex~$w$ is \term{private} to $u \in S$ if $u$ is the only $S$-member adjacent to~$w$. A maximal independent set is \term{1-Private} if every vertex in~$S$ has at most one private neighbour.
+
+Write $d_{\mathrm{leaf}}(v)$ for the number of leaf-children of vertex~$v$. The \term{Hub Exclusion Lemma} constrains how high-degree vertices interact with 1-Private independent sets.
+
+\medskip
+\noindent\textbf{Hub Exclusion Lemma} \citep{reynolds2026erdos}.
+\textit{If $d_{\mathrm{leaf}}(v) \ge 2$ and $S$ is a 1-Private maximal independent set, then $v \notin S$, and all leaf-children of~$v$ lie in~$S$.}
+\medskip
+
+The logic is direct: if~$v$ were in~$S$, each of its $\ge 2$ leaf-children would be private to~$v$, violating the 1-Private bound. Since $v \notin S$, domination forces every leaf-child into~$S$.
+
+The \term{Transfer Lemma} ensures this reduction propagates. Pruning a hub~$v$ together with its leaf-children produces a residual tree (or forest)~$T'$, and the restriction $S' = S \cap V(T')$ remains a 1-Private maximal independent set in~$T'$. Iterating over all hubs with $d_{\mathrm{leaf}} \ge 2$ terminates at a residual in which every vertex has at most one leaf-child~-- a structurally simpler class of trees.
+
+The reduction has practical implications for biological networks. Hub vertices in protein interaction networks~-- proteins with many single-degree interaction partners~-- are automatically excluded from 1-Private configurations while their partners are included. This parallels the empirical observation that hub proteins tend to be regulated rather than regulators.
+
+Finally, the \term{near-miss ratio} $\nm(T)$ quantifies how close a tree sits to the unimodality boundary. Let $j_0$ be the first index where $i_{j_0} > i_{j_0+1}$ (the first strict descent in the coefficient sequence). Then
+\[
+  \nm(T) \;=\; \max_{j > j_0} \frac{i_{j+1}(T)}{i_j(T)}.
+\]
+A value exceeding~1 would be a unimodality violation; values near~1 indicate the tree's topology nearly permits one. The companion paper shows that for trees obtained by attaching $s$~pendant leaves to a fixed hub, $\nm(s) = 1 - C/s + O(1/s^2)$ with $C \in [4, 8)$. The margin shrinks as~$s$ grows but doesn't vanish.
 
 \section{Discussion}
 
