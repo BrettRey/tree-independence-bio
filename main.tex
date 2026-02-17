@@ -33,7 +33,7 @@ Trees are everywhere in biology. Phylogenies record the branching history of spe
 
 The \term{independence polynomial} of a tree~$T$ counts the ways to select non-adjacent vertices. Call a set of vertices \term{independent} if no two are neighbours, and let $i_k(T)$ be the number of independent sets of size~$k$. The polynomial $\indpoly = \sum_k i_k(T)\, x^k$ packages these counts. A small example makes the definition concrete. Take a path of three vertices, $a$--$b$--$c$. Its independent sets are $\varnothing$, $\{a\}$, $\{b\}$, $\{c\}$, and $\{a,c\}$~-- five in all. Grouping by size gives $i_0 = 1$, $i_1 = 3$, $i_2 = 1$, so the polynomial is $1 + 3x + x^2$. The sequence 1,~3,~1 rises to a peak and then falls.
 
-\textcite{alavi1987vertex} conjectured that this single-peak pattern holds for every tree: the coefficient sequence is always \term{unimodal}. This is Erd\H{o}s Problem~993. Despite partial results \citep{chudnovsky2007roots, levit2005independence}, the conjecture remains open, though \textcite{reynolds2026erdos} has verified it for all 447\,672\,596 trees on at most 26~vertices.
+\textcite{alavi1987vertex} conjectured that this single-peak pattern holds for every tree: the coefficient sequence is always \term{unimodal}. This is Erd\H{o}s Problem~993. Despite partial results \citep{chudnovsky2007roots, levit2005independence}, the conjecture remains open, though \textcite{reynolds2026erdos} has verified it for all 1\,198\,738\,056 trees on at most 27~vertices.
 
 Why should biologists care about a graph-theoretic polynomial? In a network whose local topology is tree-like, an independent set is a collection of nodes no two of which are directly connected~-- a non-interacting subset (in the combinatorial, not the systems-biology, sense of \enquote{module}). In a dendritic arbor, it's a set of compartments that don't share a branch point. The shape of $\indpoly$~-- its mode, its width, its \term{near-miss ratio}~$\nm(T)$~-- characterises how the tree's topology distributes combinatorial freedom. The \term{hard-core model} from statistical physics \citep{galvin2004weighted, scott2005repulsive} assigns an occupation probability $\occ(v)$ to each vertex; these probabilities serve as centrality measures that reflect a vertex's role in the tree's independent-set structure.
 
@@ -89,7 +89,7 @@ Independence polynomials were computed exactly using arbitrary-precision integer
 
 \subsection{Unimodality and log-concavity}
 
-All 27 biological trees have unimodal and log-concave independence polynomials. This extends the exhaustive verification of all abstract trees on $\le 26$ vertices \citep{reynolds2026erdos} to real biological trees of much larger size~-- up to $n = 30{,}310$ vertices. Mode positions cluster near $\alpha/2$ (mode$/\alpha \approx 0.55$ for most trees), consistent with the symmetric bell-curve shape visible in Figure~\ref{fig:polyshapes}. Neither the neuronal arbors nor the phylogenetic trees produced any counterexample to the unimodality conjecture.
+All 27 biological trees have unimodal and log-concave independence polynomials. This extends the exhaustive verification of all abstract trees on $\le 27$ vertices \citep{reynolds2026erdos} to real biological trees of much larger size~-- up to $n = 30{,}310$ vertices. Mode positions cluster near $\alpha/2$ (mode$/\alpha \approx 0.55$ for most trees), consistent with the symmetric bell-curve shape visible in Figure~\ref{fig:polyshapes}. Neither the neuronal arbors nor the phylogenetic trees produced any counterexample to the unimodality conjecture.
 
 \subsection{Near-miss ratio and robustness}
 
@@ -203,7 +203,7 @@ This polynomial packages all the independent-set counts into a single object. Fo
 
 The coefficient sequence $i_0, i_1, \ldots, i_{\alpha}$ is \term{unimodal} if it rises to a single peak and then falls: there's an index~$p$ (the \term{mode}) with $i_0 \le i_1 \le \cdots \le i_p \ge i_{p+1} \ge \cdots \ge i_\alpha$. For $P_3$ the sequence 1,~3,~1 peaks at $p = 1$: unimodal.
 
-\textcite{alavi1987vertex} conjectured that every tree's independence polynomial is unimodal. Despite decades of partial results~-- including special cases such as paths, caterpillars, and spiders~-- the conjecture remains open \citep{levit2005independence}. \textcite{reynolds2026erdos} verified it computationally for all 447\,672\,596 trees on at most 26~vertices.
+\textcite{alavi1987vertex} conjectured that every tree's independence polynomial is unimodal. Despite decades of partial results~-- including special cases such as paths, caterpillars, and spiders~-- the conjecture remains open \citep{levit2005independence}. \textcite{reynolds2026erdos} verified it computationally for all 1\,198\,738\,056 trees on at most 27~vertices.
 
 A stronger property is \term{log-concavity}: $i_k^2 \ge i_{k-1}\, i_{k+1}$ for all~$k$. For $P_3$: $3^2 = 9 \ge 1 \cdot 1 = 1$. Log-concavity implies unimodality, but not conversely. \textcite{chudnovsky2007roots} proved that independence polynomials of claw-free graphs are real-rooted, which forces log-concavity for that class. But trees aren't generally claw-free, and at $n = 26$ two trees have log-concavity failures~-- yet both remain unimodal \citep{reynolds2026erdos}.
 
@@ -276,7 +276,7 @@ This paper extends the framework to biology. The structural results~-- hub exclu
 
 \subsection{Limitations and open questions}\label{sec:limitations}
 
-The unimodality conjecture for tree independence polynomials remains unproved. It has been verified exhaustively for all 447\,672\,596 abstract trees on at most 26~vertices and confirmed for all 27~biological trees in this study, but a general proof is still missing. The structural results themselves~-- Hub Exclusion and the edge bound~-- are proved unconditionally and don't depend on the conjecture, but the conjecture's open status means the bell-curve shape visible in Figure~\ref{fig:polyshapes} can't yet be asserted as universal.
+The unimodality conjecture for tree independence polynomials remains unproved. It has been verified exhaustively for all 1\,198\,738\,056 abstract trees on at most 27~vertices and confirmed for all 27~biological trees in this study, but a general proof is still missing. The structural results themselves~-- Hub Exclusion and the edge bound~-- are proved unconditionally and don't depend on the conjecture, but the conjecture's open status means the bell-curve shape visible in Figure~\ref{fig:polyshapes} can't yet be asserted as universal.
 
 Real biological networks are rarely exact trees. Dendritic arbors have gap junctions; phylogenies have reticulation events; regulatory networks have feedback loops. Extending the present results to graphs of bounded treewidth is a natural next step. The algorithm generalises directly via dynamic programming on tree decompositions, but the structural results (Hub Exclusion, the edge bound) rely on tree-specific arguments and don't obviously carry over.
 
@@ -290,7 +290,7 @@ Finally, extending the analysis from exact trees to graphs of bounded treewidth 
 
 \section{Conclusion}
 
-I applied the independence polynomial framework developed in the companion paper \citep{reynolds2026erdos} to 27 real biological trees drawn from neuronal reconstructions and published phylogenies, plus 13~\textit{E.\@ coli} transcription regulatory SIMs. All specimens are unimodal and log-concave, consistent with the exhaustive verification of every abstract tree on at most 26~vertices but now confirmed on trees two orders of magnitude larger.
+I applied the independence polynomial framework developed in the companion paper \citep{reynolds2026erdos} to 27 real biological trees drawn from neuronal reconstructions and published phylogenies, plus 13~\textit{E.\@ coli} transcription regulatory SIMs. All specimens are unimodal and log-concave, consistent with the exhaustive verification of every abstract tree on at most 27~vertices but now confirmed on trees two orders of magnitude larger.
 
 Three structural results carry biological content. First, the Hub Exclusion Lemma predicts that high-degree vertices~-- soma, polytomies, transcription factors~-- are absent from 1-Private maximal independent configurations while their peripheral neighbours are present. Per-vertex occupation probabilities confirm this quantitatively: leaves cluster near $\occ(v) \approx 0.5$ while high-degree vertices have $\occ(v) \ll 1/3$. Second, the hard-core edge bound $\occ(u) + \occ(v) < 2/3$ constrains co-occurrence along every edge. Third, the near-miss ratio $\nm(T)$ rises toward~1 with tree size ($\rho = 0.973$, $p < 0.001$), but a null-model comparison shows this convergence is a generic property of large trees, not a signature of biological architecture.
 
