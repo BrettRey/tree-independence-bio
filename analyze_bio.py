@@ -9,7 +9,6 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-sys.path.insert(0, str(Path(__file__).parent.parent / "Erdos_Problem_993"))
 
 from bio_trees import read_swc, read_newick
 from indpoly import independence_poly, is_unimodal, is_log_concave, near_miss_ratio, log_concavity_ratio

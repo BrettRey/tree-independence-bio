@@ -24,9 +24,7 @@ from collections import defaultdict
 from pathlib import Path
 
 PROJECT = Path(__file__).parent
-ERDOS = PROJECT.parent / "Erdos_Problem_993"
 sys.path.insert(0, str(PROJECT))
-sys.path.insert(0, str(ERDOS))
 
 from indpoly import independence_poly, near_miss_ratio, is_unimodal, is_log_concave
 

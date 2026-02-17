@@ -18,12 +18,10 @@ from pathlib import Path
 
 # Paths
 PROJECT = Path(__file__).parent
-ERDOS = PROJECT.parent / "Erdos_Problem_993"
 HOUSE_STYLE = PROJECT.parent.parent / ".house-style"
 FIGURES = PROJECT / "figures"
 
 sys.path.insert(0, str(PROJECT))
-sys.path.insert(0, str(ERDOS))
 sys.path.insert(0, str(HOUSE_STYLE))
 
 from bio_trees import read_swc, read_newick
@@ -470,11 +468,11 @@ def plot_nm_regression():
 
 def plot_null_model_nm():
     """Box plot comparing biological nm to null-model distributions."""
-    results_path = PROJECT / "null_model_results.json"
+    results_path = PROJECT / "null_model_results_small.json"
     if not results_path.exists():
         results_path = PROJECT / "null_model_results_quick.json"
     if not results_path.exists():
-        results_path = PROJECT / "null_model_results_small.json"
+        results_path = PROJECT / "null_model_results.json"
 
     if not results_path.exists():
         print("  No null-model results found. Run null_model.py first.")

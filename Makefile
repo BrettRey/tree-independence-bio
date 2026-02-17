@@ -14,7 +14,7 @@ OUTDIR = .
 all: $(MAIN).pdf
 
 # Full build sequence with bibliography
-$(MAIN).pdf: $(MAIN).tex references.bib
+$(MAIN).pdf: $(MAIN).tex references.bib $(wildcard references-local.bib)
 	@echo "==> First LaTeX pass..."
 	$(LATEX) -output-directory=$(OUTDIR) $(MAIN).tex
 	@echo "==> Running Biber..."
